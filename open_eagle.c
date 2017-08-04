@@ -13,7 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <High5.h>
+#include <High5/High5.h>
 #include <assert.h>
 #include "./open_eagle.h"
 
