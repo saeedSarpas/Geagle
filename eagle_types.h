@@ -1,0 +1,400 @@
+#ifndef _EAGLE_TYPES_H_
+#define _EAGLE_TYPES_H_
+
+
+#ifndef _STRING_LEN_
+#define _STRING_LEN_ 256
+#endif
+
+
+typedef struct _eagle_header_t
+{
+  double BoxSize;
+  double E_z;
+  double ExpansionFactor;
+  int Flag_Cooling;
+  int Flag_DoublePrecision;
+  int Flag_Feedback;
+  int Flag_IC_Info;
+  int Flag_Metals;
+  int Flag_Sfr;
+  int Flag_StellarAge;
+  double H_z;
+  double HubbleParam;
+  double MassTable[6];
+  int NumFilesPerSnapshot;
+  int NumPart_ThisFile[6];
+  unsigned int NumPart_Total[6];
+  unsigned int NumPart_Total_HighWord[6];
+  double Omega0;
+  double OmegaBaryon;
+  double OmegaLambda;
+  double Redshift;
+  char RunLabel[201];
+  double Time;
+} eagle_header_t;
+
+
+typedef struct _eagle_units_t
+{
+  double UnitDensity_in_cgs;
+  double UnitEnergy_in_cgs;
+  double UnitLength_in_cm;
+  double UnitMass_in_g;
+  double UnitPressure_in_cgs;
+  double UnitTime_in_s;
+  double UnitVelocity_in_cm_per_s;
+} eagle_units_t;
+
+
+typedef struct _eagle_constatns_t
+{
+  double AVOGADRO;
+  double BOLTZMANN;
+  double C;
+  double CM_PER_MPC;
+  double ELECTRONCHARGE;
+  double ELECTRONMASS;
+  double EV_TO_ERG;
+  double GAMMA;
+  double GAS_CONST;
+  double GRAVITY;
+  double HUBBLE;
+  double PI;
+  double PLANCK;
+  double PROTONMASS;
+  double RAD_CONST;
+  double SEC_PER_MEGAYEAR;
+  double SEC_PER_YEAR;
+  double SOLAR_LUM;
+  double SOLAR_MASS;
+  double STEFAN;
+  double THOMPSON;
+  double T_CMB0;
+  double Z_Solar;
+} eagle_constants_t;
+
+
+typedef struct _eagle_chemical_elements_t
+{
+  int BG_NELEMENTS;
+  double CalciumOverSilicon;
+  char ElementNames[9][21];
+  double InitAbundance_Carbon;
+  double InitAbundance_Helium;
+  double InitAbundance_Hydrogen;
+  double InitAbundance_Iron;
+  double InitAbundance_Magnesium;
+  double InitAbundance_Neon;
+  double InitAbundance_Nitrogen;
+  double InitAbundance_Oxygen;
+  double InitAbundance_Silicon;
+  double SolarAbundance;
+  double SolarAbundance_Calcium;
+  double SolarAbundance_Carbon;
+  double SolarAbundance_Helium;
+  double SolarAbundance_Hydrogen;
+  double SolarAbundance_Iron;
+  double SolarAbundance_Magnesium;
+  double SolarAbundance_Neon;
+  double SolarAbundance_Nitrogen;
+  double SolarAbundance_Oxygen;
+  double SolarAbundance_Silicon;
+  double SolarAbundance_Sulphur;
+  double SulphurOverSilicon;
+} eagle_chemical_elements_t;
+
+
+typedef struct _eagle_runtime_pars_t
+{
+  int AGB_EnergyTransferOn;
+  int AGB_MassTransferOn;
+  float ArtBulkViscConst;
+  float ArtBulkViscConstMin;
+  float ArtDiffConst;
+  float ArtDiffConstMin;
+  float BHAllocFactor;
+  float BH_ConstantHeatTemp;
+  float BH_MaxHeatLimit;
+  float BH_MaxHeatTemp;
+  float BH_MaxMergingDistanceFactor;
+  float BH_MaxRepositionDistanceFactor;
+  float BH_MinHeatLimit;
+  float BH_MinHeatTemp;
+  char BH_feedback_mode[201];
+  float BH_maxHeatingProbability;
+  float BlackHoleAccretionFactor;
+  float BlackHoleAccretionSlope;
+  float BlackHoleEddingtonFactor;
+  float BlackHoleFeedbackFactor;
+  float BlackHoleMaxAccretionRadius;
+  float BlackHoleNgbFactor;
+  float BlackHoleNumberOfNeighboursToHeat;
+  float BlackHoleRadiativeEfficiency;
+  float BlackHoleViscousAlpha;
+  float BoxSize;
+  float BufferSize;
+  float CalciumOverSilicon;
+  int ComovingIntegrationOn;
+  char CoolTablePath[201];
+  int CoolingOn;
+  float CourantFac;
+  char CpuFile[201];
+  float CpuTimeBetRestartFile;
+  int DesLinkNgb;
+  int DesNumNgb;
+  float DesNumNgbStar;
+  float DesNumNgbYoungStar;
+  float EOS_Cool_GammaEffective;
+  float EOS_Cool_MinOverDens;
+  float EOS_Cool_MinPhysDens_HpCM3;
+  float EOS_Cool_TempNorm_K;
+  float EOS_Jeans_GammaEffective;
+  float EOS_Jeans_MinOverDens;
+  float EOS_Jeans_MinPhysDens_HpCM3;
+  float EOS_Jeans_TempNorm_K;
+  float EOS_NormPhysDens_HpCM3;
+  char EnergyFile[201];
+  float ErrTolForceAcc;
+  float ErrTolIntAccuracy;
+  float ErrTolTheta;
+  float ErrTolThetaSubfind;
+  char ExtraOutputListFilename[201];
+  int FoFFormat;
+  int FoFOutputListOn;
+  int Generations;
+  float GravityConstantInternal;
+  float HubbleParam;
+  int ICFormat;
+  float IMF_Exponent;
+  char IMF_LifetimeModel[201];
+  float IMF_MaxMass_MSUN;
+  float IMF_MinMass_MSUN;
+  char IMF_Model[201];
+  char InfoFile[201];
+  float InitAbundance_Carbon;
+  float InitAbundance_Helium;
+  float InitAbundance_Hydrogen;
+  float InitAbundance_Iron;
+  float InitAbundance_Magnesium;
+  float InitAbundance_Neon;
+  float InitAbundance_Nitrogen;
+  float InitAbundance_Oxygen;
+  float InitAbundance_Silicon;
+  char InitCondFile[201];
+  float InitGasTemp;
+  float InitMetallicity;
+  int MaxMemSize;
+  float MaxNumNgbDeviation;
+  float MaxRMSDisplacementFac;
+  float MaxSizeTimestep;
+  float MaxSmoothingLengthChange;
+  float MetAllocFactor;
+  int MetDepCoolingOn;
+  float MinFoFMassForNewSeed_Msun;
+  float MinGasHsmlFractional;
+  float MinGasTemp;
+  float MinSizeTimestep;
+  int NumFilesPerSnapshot;
+  int NumFilesWrittenInParallel;
+  float Omega0;
+  float OmegaBaryon;
+  float OmegaLambda;
+  char OutputDir[201];
+  char OutputListFilename[201];
+  int OutputListOn;
+  float PartAllocFactor;
+  int PeriodicBoundariesOn;
+  float REION_H_Heating_EVpH;
+  float REION_H_ZCenter;
+  float REION_He_Heating_EVpH;
+  float REION_He_ZCenter;
+  float REION_He_ZSigma;
+  char RestartFile[201];
+  char ResubmitCommand[201];
+  int ResubmitOn;
+  char RunLabel[201];
+  float SF_SchmidtLawCoeff_MSUNpYRpKPC2;
+  float SF_SchmidtLawExponent;
+  float SF_SchmidtLawHighDensExponent;
+  float SF_SchmidtLawHighDensThresh_HpCM3;
+  int SF_THRESH_MaxPhysDensOn;
+  float SF_THRESH_MaxPhysDens_HpCM3;
+  float SF_THRESH_MetDepSFThreshMaxThresh_HpCM3;
+  float SF_THRESH_MetDepSFThreshNorm_HpCM3;
+  float SF_THRESH_MetDepSFThreshSlope;
+  float SF_THRESH_MinOverDens;
+  float SF_THRESH_MinPhysDens_HpCM3;
+  float SF_THRESH_TempMargin_DEX;
+  float SNII_Delta_T_Divided_By_T_Vir;
+  float SNII_Delta_T_K;
+  int SNII_EnergyTransferOn;
+  float SNII_Energy_ERG;
+  float SNII_Factor_Carbon;
+  float SNII_Factor_Helium;
+  float SNII_Factor_Hydrogen;
+  float SNII_Factor_Iron;
+  float SNII_Factor_Magnesium;
+  float SNII_Factor_Neon;
+  float SNII_Factor_Nitrogen;
+  float SNII_Factor_Oxygen;
+  float SNII_Factor_Silicon;
+  int SNII_MassTransferOn;
+  float SNII_MaxEnergyFraction;
+  float SNII_MaxMass_MSUN;
+  float SNII_Max_Delta_T_K;
+  float SNII_MinEnergyFraction;
+  float SNII_MinMass_MSUN;
+  float SNII_Min_Delta_T_K;
+  float SNII_Tvir0_K;
+  float SNII_Width_logTvir_dex;
+  float SNII_WindDelay_YR;
+  int SNII_WindIsotropicOn;
+  float SNII_exponent_Delta_T;
+  float SNII_normalisation_Delta_T_K;
+  float SNII_rhogas_physdensnormfac;
+  float SNII_rhogas_power;
+  float SNII_zdep_power;
+  float SNIa_Efficiency;
+  float SNIa_EjectaVelocity_KMpS;
+  float SNIa_EnergyFraction;
+  int SNIa_EnergyTransferOn;
+  int SNIa_EnergyTransferStochastic;
+  float SNIa_Energy_ERG;
+  int SNIa_MassTransferOn;
+  char SNIa_Model[201];
+  float SNIa_TimeScale;
+  float SeedBlackHoleMass_Msun;
+  int SmallOutputListOn;
+  int SmallOutputTar;
+  char SmallSnapshotFileBase[201];
+  int SnapFormat;
+  char SnapshotFileBase[201];
+  float SofteningBndry;
+  float SofteningBndryMaxPhys;
+  float SofteningBulge;
+  float SofteningBulgeMaxPhys;
+  float SofteningDisk;
+  float SofteningDiskMaxPhys;
+  float SofteningGas;
+  float SofteningGasMaxPhys;
+  float SofteningHalo;
+  float SofteningHaloMaxPhys;
+  float SofteningStars;
+  float SofteningStarsMaxPhys;
+  int StarformationOn;
+  int StellarEnergyFeedbackOn;
+  int StellarEvol_FeedbackOn;
+  float StellarEvolutionCut_Gyr;
+  int StellarEvolutionTimestepInterval;
+  int StellarMetalFeedbackOn;
+  float SulphurOverSilicon;
+  float TimeBegin;
+  float TimeBetGridOutput;
+  float TimeBetLineOfSight;
+  float TimeBetOnTheFlyFoF;
+  float TimeBetSmallSnapshot;
+  float TimeBetSnapshot;
+  float TimeBetStatistics;
+  float TimeLimitCPU;
+  float TimeMax;
+  float TimeOfFirstGridOutput;
+  float TimeOfFirstLineOfSight;
+  float TimeOfFirstSmallSnapshot;
+  float TimeOfFirstSnapshot;
+  char TimebinFile[201];
+  char TimingsFile[201];
+  float TreeDomainUpdateFrequency;
+  int TypeOfOpeningCriterion;
+  int TypeOfTimestepCriterion;
+  float UnitLength_in_cm;
+  float UnitMass_in_g;
+  float UnitVelocity_in_cm_per_s;
+  char YieldTablePath[201];
+  float massDMpart;
+  char stellar_feedback_DeltaT[201];
+  char stellar_feedback_mode[201];
+  char stellar_feedback_tvir[201];
+} eagle_runtime_pars_t;
+
+
+typedef struct _eagle_config_t
+{
+  char Config_option_000[201];
+  char Config_option_001[201];
+  char Config_option_002[201];
+  char Config_option_003[201];
+  char Config_option_004[201];
+  char Config_option_005[201];
+  char Config_option_006[201];
+  char Config_option_007[201];
+  char Config_option_008[201];
+  char Config_option_009[201];
+  char Config_option_010[201];
+  char Config_option_011[201];
+  char Config_option_012[201];
+  char Config_option_013[201];
+  char Config_option_014[201];
+  char Config_option_015[201];
+  char Config_option_016[201];
+  char Config_option_017[201];
+  char Config_option_018[201];
+  char Config_option_019[201];
+  char Config_option_020[201];
+  char Config_option_021[201];
+  char Config_option_022[201];
+  char Config_option_023[201];
+  char Config_option_024[201];
+  char Config_option_025[201];
+  char Config_option_026[201];
+  char Config_option_027[201];
+  char Config_option_028[201];
+  char Config_option_029[201];
+  char Config_option_030[201];
+  char Config_option_031[201];
+  char Config_option_032[201];
+  char Config_option_033[201];
+  char Config_option_034[201];
+  char Config_option_035[201];
+  char Config_option_036[201];
+  char Config_option_037[201];
+  char Config_option_038[201];
+  char Config_option_039[201];
+  char Config_option_040[201];
+  char Config_option_041[201];
+  char Config_option_042[201];
+  char Config_option_043[201];
+  char Config_option_044[201];
+  char Config_option_045[201];
+  char Config_option_046[201];
+  char Config_option_047[201];
+  char Config_option_048[201];
+  char Config_option_049[201];
+  char Config_option_050[201];
+  char Config_option_051[201];
+  char Config_option_052[201];
+  char Config_option_053[201];
+  char Config_option_054[201];
+  char Config_option_055[201];
+  char Config_option_056[201];
+  char Config_option_057[201];
+  char Config_option_058[201];
+  char Config_option_059[201];
+  char SVN_Version[201];
+} eagle_config_t;
+
+
+typedef struct _eagle_t
+{
+  eagle_header_t header;
+  eagle_config_t config;
+  eagle_units_t units;
+  eagle_constants_t constants;
+  eagle_runtime_pars_t runtime_pars;
+  struct _parameters {
+    eagle_chemical_elements_t chemical_elements;
+  } parameters;
+} eagle_t;
+
+
+#endif /* _EAGLE_TYPES_H_ */
