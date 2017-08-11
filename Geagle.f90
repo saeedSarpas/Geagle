@@ -1,4 +1,4 @@
-module Eagle
+module Geagle
   use hdf5
   use eagle_types
   implicit none
@@ -27,4 +27,4 @@ contains
 
     file_id = open_eagle_i(trim(fpath)//c_null_char, eagle_p)
   end subroutine open_eagle_f
-end module Eagle
+end module Geagle

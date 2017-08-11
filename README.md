@@ -1,2 +1,2 @@
-# High5
-An interface for manipulating HDF5 files
+# Geagle (Golden eagle)
+A minimalistic interface for loading EAGLE (Evolution and Assembly of GaLaxies and their Environments) snapshots
