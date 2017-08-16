@@ -14,12 +14,12 @@
 
 typedef struct _eagle_header_t
 {
+  double BoxSize, E_z, ExpansionFactor, H_z, HubbleParam, Omega0,
+    OmegaBaryon, OmegaLambda, Redshift, Time, MassTable[6];
   int Flag_Cooling, Flag_DoublePrecision, Flag_Feedback, Flag_IC_Info,
     Flag_Metals, Flag_Sfr, Flag_StellarAge, NumFilesPerSnapshot,
     NumPart_ThisFile[6], NumPart_Total[6], NumPart_Total_HighWord[6];
   char RunLabel[_STRING_LEN_];
-  double BoxSize, E_z, ExpansionFactor, H_z, HubbleParam, Omega0,
-    OmegaBaryon, OmegaLambda, Redshift, Time, MassTable[6];
 } eagle_header_t;
 
 
@@ -39,21 +39,6 @@ typedef struct _eagle_constatns_t
 } eagle_constants_t;
 
 
-typedef struct _eagle_chemical_elements_t
-{
-  int BG_NELEMENTS;
-  char ElementNames[9][21];
-  double CalciumOverSilicon, InitAbundance_Carbon, InitAbundance_Helium,
-    InitAbundance_Hydrogen, InitAbundance_Iron, InitAbundance_Magnesium,
-    InitAbundance_Neon, InitAbundance_Nitrogen, InitAbundance_Oxygen,
-    InitAbundance_Silicon, SolarAbundance, SolarAbundance_Calcium,
-    SolarAbundance_Carbon, SolarAbundance_Helium, SolarAbundance_Hydrogen,
-    SolarAbundance_Iron, SolarAbundance_Magnesium, SolarAbundance_Neon,
-    SolarAbundance_Nitrogen, SolarAbundance_Oxygen, SolarAbundance_Silicon,
-    SolarAbundance_Sulphur, SulphurOverSilicon;
-} eagle_chemical_elements_t;
-
-
 typedef struct _eagle_runtime_pars_t
 {
   int AGB_EnergyTransferOn, AGB_MassTransferOn, ComovingIntegrationOn,
@@ -66,18 +51,6 @@ typedef struct _eagle_runtime_pars_t
     SmallOutputTar, SnapFormat, StarformationOn, StellarEnergyFeedbackOn,
     StellarEvol_FeedbackOn, StellarEvolutionTimestepInterval,
     StellarMetalFeedbackOn, TypeOfOpeningCriterion, TypeOfTimestepCriterion;
-  char BH_feedback_mode[_STRING_LEN_], CoolTablePath[_STRING_LEN_],
-    CpuFile[_STRING_LEN_], EnergyFile[_STRING_LEN_],
-    ExtraOutputListFilename[_STRING_LEN_], IMF_LifetimeModel[_STRING_LEN_],
-    IMF_Model[_STRING_LEN_], InfoFile[_STRING_LEN_],
-    InitCondFile[_STRING_LEN_], OutputDir[_STRING_LEN_],
-    OutputListFilename[_STRING_LEN_], RestartFile[_STRING_LEN_],
-    ResubmitCommand[_STRING_LEN_], RunLabel[_STRING_LEN_],
-    SNIa_Model[_STRING_LEN_], SmallSnapshotFileBase[_STRING_LEN_],
-    SnapshotFileBase[_STRING_LEN_], TimebinFile[_STRING_LEN_],
-    TimingsFile[_STRING_LEN_], YieldTablePath[_STRING_LEN_],
-    stellar_feedback_DeltaT[_STRING_LEN_], stellar_feedback_mode[_STRING_LEN_],
-    stellar_feedback_tvir[_STRING_LEN_];
   float ArtBulkViscConst, ArtBulkViscConstMin, ArtDiffConst, ArtDiffConstMin,
     BHAllocFactor, BH_ConstantHeatTemp, BH_MaxHeatLimit, BH_MaxHeatTemp,
     BH_MaxMergingDistanceFactor, BH_MaxRepositionDistanceFactor,
@@ -127,7 +100,40 @@ typedef struct _eagle_runtime_pars_t
     TimeMax, TimeOfFirstGridOutput, TimeOfFirstLineOfSight,
     TimeOfFirstSmallSnapshot, TimeOfFirstSnapshot, TreeDomainUpdateFrequency,
     UnitLength_in_cm, UnitMass_in_g, UnitVelocity_in_cm_per_s, massDMpart;
+  char BH_feedback_mode[_STRING_LEN_], CoolTablePath[_STRING_LEN_],
+    CpuFile[_STRING_LEN_], EnergyFile[_STRING_LEN_],
+    ExtraOutputListFilename[_STRING_LEN_], IMF_LifetimeModel[_STRING_LEN_],
+    IMF_Model[_STRING_LEN_], InfoFile[_STRING_LEN_],
+    InitCondFile[_STRING_LEN_], OutputDir[_STRING_LEN_],
+    OutputListFilename[_STRING_LEN_], RestartFile[_STRING_LEN_],
+    ResubmitCommand[_STRING_LEN_], RunLabel[_STRING_LEN_],
+    SNIa_Model[_STRING_LEN_], SmallSnapshotFileBase[_STRING_LEN_],
+    SnapshotFileBase[_STRING_LEN_], TimebinFile[_STRING_LEN_],
+    TimingsFile[_STRING_LEN_], YieldTablePath[_STRING_LEN_],
+    stellar_feedback_DeltaT[_STRING_LEN_], stellar_feedback_mode[_STRING_LEN_],
+    stellar_feedback_tvir[_STRING_LEN_];
 } eagle_runtime_pars_t;
+
+
+typedef struct _eagle_chemical_elements_t
+{
+  int BG_NELEMENTS;
+  double CalciumOverSilicon, InitAbundance_Carbon, InitAbundance_Helium,
+    InitAbundance_Hydrogen, InitAbundance_Iron, InitAbundance_Magnesium,
+    InitAbundance_Neon, InitAbundance_Nitrogen, InitAbundance_Oxygen,
+    InitAbundance_Silicon, SolarAbundance, SolarAbundance_Calcium,
+    SolarAbundance_Carbon, SolarAbundance_Helium, SolarAbundance_Hydrogen,
+    SolarAbundance_Iron, SolarAbundance_Magnesium, SolarAbundance_Neon,
+    SolarAbundance_Nitrogen, SolarAbundance_Oxygen, SolarAbundance_Silicon,
+    SolarAbundance_Sulphur, SulphurOverSilicon;
+  char ElementNames[9][21];
+} eagle_chemical_elements_t;
+
+
+typedef struct _eagle_parameters_t
+{
+  eagle_chemical_elements_t chemical_elements;
+} eagle_parameters_t;
 
 
 typedef struct _eagle_config_t
@@ -166,21 +172,24 @@ typedef struct _eagle_config_t
 } eagle_config_t;
 
 
-typedef struct _eagle_parameters_t
-{
-  eagle_chemical_elements_t chemical_elements;
-} eagle_parameters_t;
-
-
 typedef struct _eagle_t
 {
   eagle_header_t header;
-  eagle_config_t config;
   eagle_units_t units;
-  eagle_parameters_t parameters;
   eagle_constants_t constants;
   eagle_runtime_pars_t runtime_pars;
+  eagle_parameters_t parameters;
+  eagle_config_t config;
 } eagle_t;
+
+
+typedef struct _eagle_dset_info_t
+{
+  float aexp_scale_exponent;
+  float h_scale_exponent;
+  double CGSConversionFactor;
+  char VarDescription[_STRING_LEN_];
+} eagle_dset_info_t;
 
 
 #ifdef __cplusplus

@@ -1,14 +1,16 @@
 MODULE_NAME := Geagle
 
-_CSRC := open_eagle.c
+_CSRC := open_eagle.c \
+         read_eagle_dset.c
 
-_TSRC := open_eagle_tests.c
+_TSRC := open_eagle_tests.c \
+         read_eagle_dset_tests.c
 
 _FSRC := eagle_types_f.f90 \
          Geagle.f90
 
 _CLIBS := -lHigh5 -lhdf5
 
-_FLIBS :=
+_FLIBS := -I /scratch/saeed/.local/include
 
 include ./Makefile.paCage/Makefile

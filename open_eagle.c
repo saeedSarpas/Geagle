@@ -1,6 +1,6 @@
 /*
- * eagle_open.c
- * tests_file: eagle_open_tests.c
+ * open_eagle.c
+ * tests_file: open_eagle_tests.c
  *
  * Open an eagle snapshot and loading its general info (header, constants, etc)
  *
@@ -25,46 +25,40 @@
 
 hid_t open_eagle(char *fpath, eagle_t *eagle)
 {
-  hid_t fid; /*File and group identifiers*/
+  hid_t file_id; /*File and group identifiers*/
 
-  fid = H5Fopen(fpath, H5F_ACC_RDONLY, H5P_DEFAULT);
-
-  if(fid < 0)
-    {
-      PRINT("Unable to open the HDF5 file: %s\n", fpath);
-      return EXIT_FAILURE;
-    }
+  file_id = open_h5(fpath, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   read_h5attrs(
-    fid, "Header",
+    file_id, "Header",
     "BoxSize", H5T_NATIVE_DOUBLE, &(eagle->header.BoxSize),
     "E(z)", H5T_NATIVE_DOUBLE, &(eagle->header.E_z),
     "ExpansionFactor", H5T_NATIVE_DOUBLE, &(eagle->header.ExpansionFactor),
-    "Flag_Cooling", H5T_NATIVE_INT32, &(eagle->header.Flag_Cooling),
-    "Flag_DoublePrecision", H5T_NATIVE_INT32, &(eagle->header.Flag_DoublePrecision),
-    "Flag_Feedback", H5T_NATIVE_INT32, &(eagle->header.Flag_Feedback),
-    "Flag_IC_Info", H5T_NATIVE_INT32, &(eagle->header.Flag_IC_Info),
-    "Flag_Metals", H5T_NATIVE_INT32, &(eagle->header.Flag_Metals),
-    "Flag_Sfr", H5T_NATIVE_INT32, &(eagle->header.Flag_Sfr),
-    "Flag_StellarAge", H5T_NATIVE_INT32, &(eagle->header.Flag_StellarAge),
     "H(z)", H5T_NATIVE_DOUBLE, &(eagle->header.H_z),
     "HubbleParam", H5T_NATIVE_DOUBLE, &(eagle->header.HubbleParam),
-    "MassTable", H5T_NATIVE_DOUBLE, eagle->header.MassTable,
-    "NumFilesPerSnapshot", H5T_NATIVE_INT, &(eagle->header.NumFilesPerSnapshot),
-    "NumPart_ThisFile", H5T_NATIVE_INT32, eagle->header.NumPart_ThisFile,
-    "NumPart_Total", H5T_NATIVE_INT, eagle->header.NumPart_Total,
-    "NumPart_Total_HighWord", H5T_NATIVE_INT, eagle->header.NumPart_Total_HighWord,
     "Omega0", H5T_NATIVE_DOUBLE, &(eagle->header.Omega0),
     "OmegaBaryon", H5T_NATIVE_DOUBLE, &(eagle->header.OmegaBaryon),
     "OmegaLambda", H5T_NATIVE_DOUBLE, &(eagle->header.OmegaLambda),
     "Redshift", H5T_NATIVE_DOUBLE, &(eagle->header.Redshift),
-    "RunLabel", H5T_STRING, eagle->header.RunLabel,
     "Time", H5T_NATIVE_DOUBLE, &(eagle->header.Time),
+    "MassTable", H5T_NATIVE_DOUBLE, eagle->header.MassTable,
+    "Flag_Cooling", H5T_NATIVE_INT, &(eagle->header.Flag_Cooling),
+    "Flag_DoublePrecision", H5T_NATIVE_INT, &(eagle->header.Flag_DoublePrecision),
+    "Flag_Feedback", H5T_NATIVE_INT, &(eagle->header.Flag_Feedback),
+    "Flag_IC_Info", H5T_NATIVE_INT, &(eagle->header.Flag_IC_Info),
+    "Flag_Metals", H5T_NATIVE_INT, &(eagle->header.Flag_Metals),
+    "Flag_Sfr", H5T_NATIVE_INT, &(eagle->header.Flag_Sfr),
+    "Flag_StellarAge", H5T_NATIVE_INT, &(eagle->header.Flag_StellarAge),
+    "NumFilesPerSnapshot", H5T_NATIVE_INT, &(eagle->header.NumFilesPerSnapshot),
+    "NumPart_ThisFile", H5T_NATIVE_INT, &(eagle->header.NumPart_ThisFile),
+    "NumPart_Total", H5T_NATIVE_UINT, &(eagle->header.NumPart_Total),
+    "NumPart_Total_HighWord", H5T_NATIVE_UINT, &(eagle->header.NumPart_Total_HighWord),
+    "RunLabel", H5T_STRING, eagle->header.RunLabel,
     NULL
   );
 
   read_h5attrs(
-    fid, "Units",
+    file_id, "Units",
     "UnitDensity_in_cgs", H5T_NATIVE_DOUBLE, &(eagle->units.UnitDensity_in_cgs),
     "UnitEnergy_in_cgs", H5T_NATIVE_DOUBLE, &(eagle->units.UnitEnergy_in_cgs),
     "UnitLength_in_cm", H5T_NATIVE_DOUBLE, &(eagle->units.UnitLength_in_cm),
@@ -76,7 +70,7 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
   );
 
   read_h5attrs(
-    fid, "Constants",
+    file_id, "Constants",
     "AVOGADRO", H5T_NATIVE_DOUBLE, &(eagle->constants.AVOGADRO),
     "BOLTZMANN", H5T_NATIVE_DOUBLE, &(eagle->constants.BOLTZMANN),
     "C", H5T_NATIVE_DOUBLE, &(eagle->constants.C),
@@ -104,8 +98,8 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
   );
 
   read_h5attrs(
-    fid, "Parameters/ChemicalElements",
-    "BG_NELEMENTS", H5T_NATIVE_INT32, &(eagle->parameters.chemical_elements.BG_NELEMENTS),
+    file_id, "Parameters/ChemicalElements",
+    "BG_NELEMENTS", H5T_NATIVE_INT, &(eagle->parameters.chemical_elements.BG_NELEMENTS),
     "CalciumOverSilicon", H5T_NATIVE_DOUBLE, &(eagle->parameters.chemical_elements.CalciumOverSilicon),
     "ElementNames", H5T_STRING, eagle->parameters.chemical_elements.ElementNames[0],
     "InitAbundance_Carbon", H5T_NATIVE_DOUBLE, &(eagle->parameters.chemical_elements.InitAbundance_Carbon),
@@ -134,9 +128,9 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
   );
 
   read_h5attrs(
-    fid, "RuntimePars",
-    "AGB_EnergyTransferOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.AGB_EnergyTransferOn),
-    "AGB_MassTransferOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.AGB_MassTransferOn),
+    file_id, "RuntimePars",
+    "AGB_EnergyTransferOn", H5T_NATIVE_INT, &(eagle->runtime_pars.AGB_EnergyTransferOn),
+    "AGB_MassTransferOn", H5T_NATIVE_INT, &(eagle->runtime_pars.AGB_MassTransferOn),
     "ArtBulkViscConst", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.ArtBulkViscConst),
     "ArtBulkViscConstMin", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.ArtBulkViscConstMin),
     "ArtDiffConst", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.ArtDiffConst),
@@ -163,14 +157,14 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "BoxSize", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.BoxSize),
     "BufferSize", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.BufferSize),
     "CalciumOverSilicon", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.CalciumOverSilicon),
-    "ComovingIntegrationOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.ComovingIntegrationOn),
+    "ComovingIntegrationOn", H5T_NATIVE_INT, &(eagle->runtime_pars.ComovingIntegrationOn),
     "CoolTablePath", H5T_STRING, eagle->runtime_pars.CoolTablePath,
-    "CoolingOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.CoolingOn),
+    "CoolingOn", H5T_NATIVE_INT, &(eagle->runtime_pars.CoolingOn),
     "CourantFac", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.CourantFac),
     "CpuFile", H5T_STRING, eagle->runtime_pars.CpuFile,
     "CpuTimeBetRestartFile", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.CpuTimeBetRestartFile),
-    "DesLinkNgb", H5T_NATIVE_INT32, &(eagle->runtime_pars.DesLinkNgb),
-    "DesNumNgb", H5T_NATIVE_INT32, &(eagle->runtime_pars.DesNumNgb),
+    "DesLinkNgb", H5T_NATIVE_INT, &(eagle->runtime_pars.DesLinkNgb),
+    "DesNumNgb", H5T_NATIVE_INT, &(eagle->runtime_pars.DesNumNgb),
     "DesNumNgbStar", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.DesNumNgbStar),
     "DesNumNgbYoungStar", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.DesNumNgbYoungStar),
     "EOS_Cool_GammaEffective", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.EOS_Cool_GammaEffective),
@@ -188,12 +182,12 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "ErrTolTheta", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.ErrTolTheta),
     "ErrTolThetaSubfind", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.ErrTolThetaSubfind),
     "ExtraOutputListFilename", H5T_STRING, eagle->runtime_pars.ExtraOutputListFilename,
-    "FoFFormat", H5T_NATIVE_INT32, &(eagle->runtime_pars.FoFFormat),
-    "FoFOutputListOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.FoFOutputListOn),
-    "Generations", H5T_NATIVE_INT32, &(eagle->runtime_pars.Generations),
+    "FoFFormat", H5T_NATIVE_INT, &(eagle->runtime_pars.FoFFormat),
+    "FoFOutputListOn", H5T_NATIVE_INT, &(eagle->runtime_pars.FoFOutputListOn),
+    "Generations", H5T_NATIVE_INT, &(eagle->runtime_pars.Generations),
     "GravityConstantInternal", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.GravityConstantInternal),
     "HubbleParam", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.HubbleParam),
-    "ICFormat", H5T_NATIVE_INT32, &(eagle->runtime_pars.ICFormat),
+    "ICFormat", H5T_NATIVE_INT, &(eagle->runtime_pars.ICFormat),
     "IMF_Exponent", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.IMF_Exponent),
     "IMF_LifetimeModel", H5T_STRING, eagle->runtime_pars.IMF_LifetimeModel,
     "IMF_MaxMass_MSUN", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.IMF_MaxMass_MSUN),
@@ -212,27 +206,27 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "InitCondFile", H5T_STRING, eagle->runtime_pars.InitCondFile,
     "InitGasTemp", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.InitGasTemp),
     "InitMetallicity", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.InitMetallicity),
-    "MaxMemSize", H5T_NATIVE_INT32, &(eagle->runtime_pars.MaxMemSize),
+    "MaxMemSize", H5T_NATIVE_INT, &(eagle->runtime_pars.MaxMemSize),
     "MaxNumNgbDeviation", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MaxNumNgbDeviation),
     "MaxRMSDisplacementFac", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MaxRMSDisplacementFac),
     "MaxSizeTimestep", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MaxSizeTimestep),
     "MaxSmoothingLengthChange", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MaxSmoothingLengthChange),
     "MetAllocFactor", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MetAllocFactor),
-    "MetDepCoolingOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.MetDepCoolingOn),
+    "MetDepCoolingOn", H5T_NATIVE_INT, &(eagle->runtime_pars.MetDepCoolingOn),
     "MinFoFMassForNewSeed_Msun", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MinFoFMassForNewSeed_Msun),
     "MinGasHsmlFractional", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MinGasHsmlFractional),
     "MinGasTemp", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MinGasTemp),
     "MinSizeTimestep", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.MinSizeTimestep),
-    "NumFilesPerSnapshot", H5T_NATIVE_INT32, &(eagle->runtime_pars.NumFilesPerSnapshot),
-    "NumFilesWrittenInParallel", H5T_NATIVE_INT32, &(eagle->runtime_pars.NumFilesWrittenInParallel),
+    "NumFilesPerSnapshot", H5T_NATIVE_INT, &(eagle->runtime_pars.NumFilesPerSnapshot),
+    "NumFilesWrittenInParallel", H5T_NATIVE_INT, &(eagle->runtime_pars.NumFilesWrittenInParallel),
     "Omega0", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.Omega0),
     "OmegaBaryon", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.OmegaBaryon),
     "OmegaLambda", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.OmegaLambda),
     "OutputDir", H5T_STRING, eagle->runtime_pars.OutputDir,
     "OutputListFilename", H5T_STRING, eagle->runtime_pars.OutputListFilename,
-    "OutputListOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.OutputListOn),
+    "OutputListOn", H5T_NATIVE_INT, &(eagle->runtime_pars.OutputListOn),
     "PartAllocFactor", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.PartAllocFactor),
-    "PeriodicBoundariesOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.PeriodicBoundariesOn),
+    "PeriodicBoundariesOn", H5T_NATIVE_INT, &(eagle->runtime_pars.PeriodicBoundariesOn),
     "REION_H_Heating_EVpH", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.REION_H_Heating_EVpH),
     "REION_H_ZCenter", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.REION_H_ZCenter),
     "REION_He_Heating_EVpH", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.REION_He_Heating_EVpH),
@@ -240,13 +234,13 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "REION_He_ZSigma", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.REION_He_ZSigma),
     "RestartFile", H5T_STRING, eagle->runtime_pars.RestartFile,
     "ResubmitCommand", H5T_STRING, eagle->runtime_pars.ResubmitCommand,
-    "ResubmitOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.ResubmitOn),
+    "ResubmitOn", H5T_NATIVE_INT, &(eagle->runtime_pars.ResubmitOn),
     "RunLabel", H5T_STRING, eagle->runtime_pars.RunLabel,
     "SF_SchmidtLawCoeff_MSUNpYRpKPC2", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_SchmidtLawCoeff_MSUNpYRpKPC2),
     "SF_SchmidtLawExponent", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_SchmidtLawExponent),
     "SF_SchmidtLawHighDensExponent", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_SchmidtLawHighDensExponent),
     "SF_SchmidtLawHighDensThresh_HpCM3", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_SchmidtLawHighDensThresh_HpCM3),
-    "SF_THRESH_MaxPhysDensOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.SF_THRESH_MaxPhysDensOn),
+    "SF_THRESH_MaxPhysDensOn", H5T_NATIVE_INT, &(eagle->runtime_pars.SF_THRESH_MaxPhysDensOn),
     "SF_THRESH_MaxPhysDens_HpCM3", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_THRESH_MaxPhysDens_HpCM3),
     "SF_THRESH_MetDepSFThreshMaxThresh_HpCM3", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_THRESH_MetDepSFThreshMaxThresh_HpCM3),
     "SF_THRESH_MetDepSFThreshNorm_HpCM3", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_THRESH_MetDepSFThreshNorm_HpCM3),
@@ -256,7 +250,7 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "SF_THRESH_TempMargin_DEX", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SF_THRESH_TempMargin_DEX),
     "SNII_Delta_T_Divided_By_T_Vir", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Delta_T_Divided_By_T_Vir),
     "SNII_Delta_T_K", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Delta_T_K),
-    "SNII_EnergyTransferOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.SNII_EnergyTransferOn),
+    "SNII_EnergyTransferOn", H5T_NATIVE_INT, &(eagle->runtime_pars.SNII_EnergyTransferOn),
     "SNII_Energy_ERG", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Energy_ERG),
     "SNII_Factor_Carbon", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Factor_Carbon),
     "SNII_Factor_Helium", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Factor_Helium),
@@ -267,7 +261,7 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "SNII_Factor_Nitrogen", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Factor_Nitrogen),
     "SNII_Factor_Oxygen", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Factor_Oxygen),
     "SNII_Factor_Silicon", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Factor_Silicon),
-    "SNII_MassTransferOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.SNII_MassTransferOn),
+    "SNII_MassTransferOn", H5T_NATIVE_INT, &(eagle->runtime_pars.SNII_MassTransferOn),
     "SNII_MaxEnergyFraction", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_MaxEnergyFraction),
     "SNII_MaxMass_MSUN", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_MaxMass_MSUN),
     "SNII_Max_Delta_T_K", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Max_Delta_T_K),
@@ -277,7 +271,7 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "SNII_Tvir0_K", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Tvir0_K),
     "SNII_Width_logTvir_dex", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_Width_logTvir_dex),
     "SNII_WindDelay_YR", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_WindDelay_YR),
-    "SNII_WindIsotropicOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.SNII_WindIsotropicOn),
+    "SNII_WindIsotropicOn", H5T_NATIVE_INT, &(eagle->runtime_pars.SNII_WindIsotropicOn),
     "SNII_exponent_Delta_T", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_exponent_Delta_T),
     "SNII_normalisation_Delta_T_K", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_normalisation_Delta_T_K),
     "SNII_rhogas_physdensnormfac", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNII_rhogas_physdensnormfac),
@@ -286,17 +280,17 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "SNIa_Efficiency", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNIa_Efficiency),
     "SNIa_EjectaVelocity_KMpS", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNIa_EjectaVelocity_KMpS),
     "SNIa_EnergyFraction", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNIa_EnergyFraction),
-    "SNIa_EnergyTransferOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.SNIa_EnergyTransferOn),
-    "SNIa_EnergyTransferStochastic", H5T_NATIVE_INT32, &(eagle->runtime_pars.SNIa_EnergyTransferStochastic),
+    "SNIa_EnergyTransferOn", H5T_NATIVE_INT, &(eagle->runtime_pars.SNIa_EnergyTransferOn),
+    "SNIa_EnergyTransferStochastic", H5T_NATIVE_INT, &(eagle->runtime_pars.SNIa_EnergyTransferStochastic),
     "SNIa_Energy_ERG", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNIa_Energy_ERG),
-    "SNIa_MassTransferOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.SNIa_MassTransferOn),
+    "SNIa_MassTransferOn", H5T_NATIVE_INT, &(eagle->runtime_pars.SNIa_MassTransferOn),
     "SNIa_Model", H5T_STRING, eagle->runtime_pars.SNIa_Model,
     "SNIa_TimeScale", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SNIa_TimeScale),
     "SeedBlackHoleMass_Msun", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SeedBlackHoleMass_Msun),
-    "SmallOutputListOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.SmallOutputListOn),
-    "SmallOutputTar", H5T_NATIVE_INT32, &(eagle->runtime_pars.SmallOutputTar),
+    "SmallOutputListOn", H5T_NATIVE_INT, &(eagle->runtime_pars.SmallOutputListOn),
+    "SmallOutputTar", H5T_NATIVE_INT, &(eagle->runtime_pars.SmallOutputTar),
     "SmallSnapshotFileBase", H5T_STRING, eagle->runtime_pars.SmallSnapshotFileBase,
-    "SnapFormat", H5T_NATIVE_INT32, &(eagle->runtime_pars.SnapFormat),
+    "SnapFormat", H5T_NATIVE_INT, &(eagle->runtime_pars.SnapFormat),
     "SnapshotFileBase", H5T_STRING, eagle->runtime_pars.SnapshotFileBase,
     "SofteningBndry", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SofteningBndry),
     "SofteningBndryMaxPhys", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SofteningBndryMaxPhys),
@@ -310,12 +304,12 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "SofteningHaloMaxPhys", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SofteningHaloMaxPhys),
     "SofteningStars", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SofteningStars),
     "SofteningStarsMaxPhys", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SofteningStarsMaxPhys),
-    "StarformationOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.StarformationOn),
-    "StellarEnergyFeedbackOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.StellarEnergyFeedbackOn),
-    "StellarEvol_FeedbackOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.StellarEvol_FeedbackOn),
+    "StarformationOn", H5T_NATIVE_INT, &(eagle->runtime_pars.StarformationOn),
+    "StellarEnergyFeedbackOn", H5T_NATIVE_INT, &(eagle->runtime_pars.StellarEnergyFeedbackOn),
+    "StellarEvol_FeedbackOn", H5T_NATIVE_INT, &(eagle->runtime_pars.StellarEvol_FeedbackOn),
     "StellarEvolutionCut_Gyr", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.StellarEvolutionCut_Gyr),
-    "StellarEvolutionTimestepInterval", H5T_NATIVE_INT32, &(eagle->runtime_pars.StellarEvolutionTimestepInterval),
-    "StellarMetalFeedbackOn", H5T_NATIVE_INT32, &(eagle->runtime_pars.StellarMetalFeedbackOn),
+    "StellarEvolutionTimestepInterval", H5T_NATIVE_INT, &(eagle->runtime_pars.StellarEvolutionTimestepInterval),
+    "StellarMetalFeedbackOn", H5T_NATIVE_INT, &(eagle->runtime_pars.StellarMetalFeedbackOn),
     "SulphurOverSilicon", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.SulphurOverSilicon),
     "TimeBegin", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.TimeBegin),
     "TimeBetGridOutput", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.TimeBetGridOutput),
@@ -333,8 +327,8 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "TimebinFile", H5T_STRING, eagle->runtime_pars.TimebinFile,
     "TimingsFile", H5T_STRING, eagle->runtime_pars.TimingsFile,
     "TreeDomainUpdateFrequency", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.TreeDomainUpdateFrequency),
-    "TypeOfOpeningCriterion", H5T_NATIVE_INT32, &(eagle->runtime_pars.TypeOfOpeningCriterion),
-    "TypeOfTimestepCriterion", H5T_NATIVE_INT32, &(eagle->runtime_pars.TypeOfTimestepCriterion),
+    "TypeOfOpeningCriterion", H5T_NATIVE_INT, &(eagle->runtime_pars.TypeOfOpeningCriterion),
+    "TypeOfTimestepCriterion", H5T_NATIVE_INT, &(eagle->runtime_pars.TypeOfTimestepCriterion),
     "UnitLength_in_cm", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.UnitLength_in_cm),
     "UnitMass_in_g", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.UnitMass_in_g),
     "UnitVelocity_in_cm_per_s", H5T_NATIVE_FLOAT, &(eagle->runtime_pars.UnitVelocity_in_cm_per_s),
@@ -346,7 +340,7 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     NULL);
 
   read_h5attrs(
-    fid, "Config",
+    file_id, "Config",
     "Config_option_000", H5T_STRING, eagle->config.Config_option_000,
     "Config_option_001", H5T_STRING, eagle->config.Config_option_001,
     "Config_option_002", H5T_STRING, eagle->config.Config_option_002,
@@ -410,8 +404,5 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "SVN_Version", H5T_STRING, eagle->config.SVN_Version,
     NULL);
 
-  if (H5Fclose(fid) < 0)
-    PRINT("Unable to close file: %s", fpath);
-
-  return fid;
+  return file_id;
 }
