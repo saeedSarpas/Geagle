@@ -28,6 +28,11 @@ module Geagle
      end function read_eagle_dset_i
   end interface
 
+  interface read_eagle_dset_f
+     module procedure read_eagle_dset_1d_f
+     module procedure read_eagle_dset_2d_f
+  end interface read_eagle_dset_f
+
 
 contains
   subroutine open_eagle_f(fpath, eagle_o, file_id)
@@ -52,13 +57,13 @@ contains
     file_id = open_eagle_i(trim(fpath)//c_null_char, eagle_p)
   end subroutine open_eagle_f
 
-  subroutine read_eagle_dset_f(file_id, dset_name, dtype_id, buf, err, dset_info)
+  subroutine read_eagle_dset_1d_f(file_id, dset_name, dtype_id, buf, err, dset_info)
     implicit none
     integer(hid_t), value, intent(in) :: file_id
     character(len=*), intent(in) :: dset_name
     integer(hid_t), value, intent(in) :: dtype_id
     class(*), dimension(:), target :: buf
-    integer(kind=4), intent(out), optional :: err
+    integer, optional :: err
     type(eagle_dset_info_t), target, optional :: dset_info
 
     type(c_ptr) :: buf_p
@@ -85,5 +90,41 @@ contains
 
     err = read_eagle_dset_i(file_id, trim(dset_name)//c_null_char, dtype_id, &
          buf_p, dset_info_p)
-  end subroutine read_eagle_dset_f
+  end subroutine read_eagle_dset_1d_f
+
+  subroutine read_eagle_dset_2d_f(file_id, dset_name, dtype_id, buf, err, dset_info)
+    implicit none
+    integer(hid_t), value, intent(in) :: file_id
+    character(len=*), intent(in) :: dset_name
+    integer(hid_t), value, intent(in) :: dtype_id
+    class(*), dimension(:,:), target :: buf
+    integer, optional :: err
+    type(eagle_dset_info_t), target, optional :: dset_info
+
+    type(c_ptr) :: buf_p
+    type(c_ptr) :: dset_info_p
+
+
+    if (present(dset_info)) then
+       dset_info_p = c_loc(dset_info)
+    else
+       dset_info_p = c_null_ptr
+    end if
+
+    ! c_loc doesn't accept a polymorphic variable. Following is an attempt to
+    ! overcome this problem
+    select type(buf)
+    type is (integer(kind=4))
+       buf_p = c_loc(buf(1,1))
+    type is (integer(kind=8))
+       buf_p = c_loc(buf(1,1))
+    type is (real(kind=4))
+       buf_p = c_loc(buf(1,1))
+    type is (real(kind=8))
+       buf_p = c_loc(buf(1,1))
+    end select
+
+    err = read_eagle_dset_i(file_id, trim(dset_name)//c_null_char, dtype_id, &
+         buf_p, dset_info_p)
+  end subroutine read_eagle_dset_2d_f
 end module Geagle
