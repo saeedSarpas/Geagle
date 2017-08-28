@@ -8,7 +8,7 @@
 #include "./open_eagle.h"
 
 
-#define EAGLE_PATH "./sample_eagle_output.hdf5"
+#define EAGLE_PATH "./snapshot/eagle_snap.0.hdf5"
 
 
 Describe(open_eagle);

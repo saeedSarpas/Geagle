@@ -8,8 +8,8 @@
 #include "./open_eagle.h"
 
 
-#define EAGLE_PATH "./sample_eagle_output.hdf5"
-#define EAGLE_1D_DSET "PartType4/SmoothedElementAbundance/Hydrogen"
+#define EAGLE_PATH "./snapshot/eagle_snap.0.hdf5"
+#define EAGLE_1D_DSET "PartType4/ElementAbundance/Hydrogen"
 #define EAGLE_1D_DSET_LEN 1197
 #define EAGLE_3D_DSET "PartType4/Coordinates"
 #define EAGLE_3D_DSET_LEN (1197 * 3)
@@ -58,27 +58,41 @@ Ensure(read_eagle_dset, reads_eagle_1d_dataset)
 
   assert_that(
     read_eagle_dset(file_id, EAGLE_1D_DSET, H5T_NATIVE_FLOAT, buf, &dset_info),
-              is_equal_to(EXIT_SUCCESS));
+    is_equal_to(EXIT_SUCCESS));
 
-  assert_that_double(buf[0], is_equal_to_double(0.7514407));
-  assert_that_double(buf[99], is_equal_to_double(0.7449196));
-  assert_that_double(buf[199], is_equal_to_double(0.752));
-  assert_that_double(buf[299], is_equal_to_double(0.7489501));
-  assert_that_double(buf[399], is_equal_to_double(0.74998695));
-  assert_that_double(buf[499], is_equal_to_double(0.7513988));
-  assert_that_double(buf[599], is_equal_to_double(0.7493566));
-  assert_that_double(buf[699], is_equal_to_double(0.75077426));
-  assert_that_double(buf[799], is_equal_to_double(0.7518974));
-  assert_that_double(buf[899], is_equal_to_double(0.7498404));
-  assert_that_double(buf[999], is_equal_to_double(0.7496314));
-  assert_that_double(buf[1099], is_equal_to_double(0.7489508));
-  assert_that_double(buf[1196], is_equal_to_double(0.75185496));
+  hid_t dset_id, dspace, mspace;
+  hsize_t start[1] = {0}, count[1] = {1}, dimsm[1] = {EAGLE_1D_DSET_LEN};
+  float value[0];
+
+  for (int i = 0; i < EAGLE_1D_DSET_LEN; i += 17)
+    {
+      start[0] = i; /* Offset from the begining of the dataset */
+
+      dset_id = H5Dopen(file_id, EAGLE_1D_DSET, H5P_DEFAULT);
+
+      dspace = H5Dget_space(dset_id);
+      H5Sselect_hyperslab(dspace, H5S_SELECT_SET, start , NULL, count, NULL);
+
+      mspace = H5Screate_simple(1, dimsm, NULL);
+
+      start[0] = 0; /* Offset from dspace */
+      H5Sselect_hyperslab(mspace, H5S_SELECT_SET, start, NULL, count, NULL);
+
+      H5Dread(dset_id, H5T_NATIVE_FLOAT, mspace, dspace, H5P_DEFAULT, value);
+
+      assert_that_double(buf[i], is_equal_to_double(value[0]));
+
+      H5Sselect_none(mspace);
+      H5Sselect_none(dspace);
+
+      H5Dclose(dset_id);
+    }
 
   assert_that_double(dset_info.CGSConversionFactor, is_equal_to_double(1.0));
 
   assert_that(
     dset_info.VarDescription,
-    is_equal_to_string("Smoothed mass fractions of chemical elements"));
+    is_equal_to_string("Mass fractions of chemical elements"));
 
   assert_that_double(dset_info.aexp_scale_exponent, is_equal_to_double(0.0));
   assert_that_double(dset_info.h_scale_exponent, is_equal_to_double(0.0));
