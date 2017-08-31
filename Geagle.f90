@@ -4,15 +4,15 @@ module Geagle
   implicit none
 
   interface
-     function open_eagle_i(fpath, eagle) bind(C, name="open_eagle")
+     function init_eagle_i(fpath, eagle) bind(C, name="init_eagle")
        use hdf5
        use eagle_types
        use iso_c_binding
        implicit none
        character(len=1, kind=c_char), dimension(*), intent(in) :: fpath
        type(c_ptr), value, intent(in) :: eagle
-       integer(kind=c_int) :: open_eagle_i
-     end function open_eagle_i
+       integer(kind=c_int) :: init_eagle_i
+     end function init_eagle_i
 
      function read_eagle_dset_i(file_path, p_type, dset_name, dtype_id, buf, &
           dest_info) bind (C, name="read_eagle_dset")
@@ -36,11 +36,11 @@ module Geagle
 
 
 contains
-  subroutine open_eagle_f(fpath, eagle_o, file_id)
+  subroutine init_eagle_f(fpath, eagle_o, status)
     implicit none
     character(len=*), intent(in) :: fpath
     type(eagle_t), target :: eagle_o
-    integer(hid_t), intent(out), optional :: file_id
+    integer, intent(out), optional :: status
 
     type(c_ptr) :: eagle_p
 
@@ -55,8 +55,8 @@ contains
 
     eagle_p = c_loc(eagle_o)
 
-    file_id = open_eagle_i(trim(fpath)//c_null_char, eagle_p)
-  end subroutine open_eagle_f
+    status = init_eagle_i(trim(fpath)//c_null_char, eagle_p)
+  end subroutine init_eagle_f
 
 
   subroutine read_eagle_dset_1d_f(file_path, p_type, dset_name, dtype_id, buf, &

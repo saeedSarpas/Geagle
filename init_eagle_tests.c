@@ -1,27 +1,28 @@
 /*
- * open_eagle_tests.c
+ * init_eagle_tests.c
  */
 
 
 #include <cgreen/cgreen.h>
 #include <math.h>
-#include "./open_eagle.h"
+#include "./init_eagle.h"
 
 
-#define EAGLE_PATH "./snapshot/eagle_snap.0.hdf5"
+#define EAGLE_PATH "./snapshot/eagle_snap.%d.hdf5"
 
 
-Describe(open_eagle);
-BeforeEach(open_eagle) {};
-AfterEach(open_eagle) {};
+Describe(init_eagle);
+BeforeEach(init_eagle) {};
+AfterEach(init_eagle) {};
 
 
-Ensure(open_eagle, fills_eagle_object)
+Ensure(init_eagle, fills_eagle_object)
 {
   eagle_t eagle;
 
-  hid_t fid = open_eagle(EAGLE_PATH, &eagle);
-  assert_that(fid, is_not_equal_to(EXIT_FAILURE));
+  int err = init_eagle(EAGLE_PATH, &eagle);
+  assert_that(err, is_not_equal_to(EXIT_FAILURE));
+  assert_that(err, is_equal_to(EXIT_SUCCESS));
 
   /* Header */
   assert_that_double(eagle.header.BoxSize, is_equal_to_double(8.47125));

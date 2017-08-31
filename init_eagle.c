@@ -1,21 +1,23 @@
 /*
- * open_eagle.c
- * tests_file: open_eagle_tests.c
+ * init_eagle.c
+ * tests_file: init_eagle_tests.c
  *
- * Open an eagle snapshot and loading its general info (header, constants, etc)
+ * Initialize the package by loading the snapshot general info (header,
+ * constants, etc)
  *
- * @param: fpath: File path
+ * @param: file_path: Formatted file path, e.g. /path/to/snap.%d.h5
  * @param: eagle: An eagle object to be filled
  *
- * @return: File indicator (or in case of error standard EXIT_FAILURE)
+ * @return: Standard EXIT_SUCCESS (EXIT_FAILURE on errors)
  */
 
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <High5/High5.h>
 #include <assert.h>
-#include "./open_eagle.h"
+#include "./init_eagle.h"
 
 
 #ifndef PRINT
@@ -23,11 +25,18 @@
 #endif
 
 
-hid_t open_eagle(char *fpath, eagle_t *eagle)
+hid_t init_eagle(char *file_path_fmt, eagle_t *eagle)
 {
-  hid_t file_id; /*File and group identifiers*/
+  if(strstr(file_path_fmt, "%d") == NULL) {
+    printf("[Warning] Please use a formatted file path.\n");
+    printf("          e.g. /path/to/eagle/snap.%%d.h5\n");
+    return EXIT_FAILURE;
+  }
 
-  file_id = open_h5(fpath, H5F_ACC_RDONLY, H5P_DEFAULT);
+  char file_path[1024];
+  sprintf(file_path, file_path_fmt, 0);
+
+  hid_t file_id = open_h5(file_path, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   read_h5attrs(
     file_id, "Header",
@@ -404,5 +413,8 @@ hid_t open_eagle(char *fpath, eagle_t *eagle)
     "SVN_Version", H5T_STRING, eagle->config.SVN_Version,
     NULL);
 
-  return file_id;
+  if(close_h5(file_id) == EXIT_FAILURE)
+    return EXIT_FAILURE;
+
+  return EXIT_SUCCESS;
 }

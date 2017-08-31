@@ -6,7 +6,6 @@
 #include <cgreen/cgreen.h>
 #include <assert.h>
 #include "./read_eagle_dset.h"
-#include "./open_eagle.h"
 
 
 #define DSET_1D_NAME "ElementAbundance/Hydrogen"

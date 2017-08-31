@@ -4,8 +4,9 @@
  *
  * Read an EAGLE dataset
  *
- * @param: file_id: File identifier (should be opened beforehand)
- * @param: dset_name: Path to the dataset
+ * @param: file_path_fmt: Formatted snapshot path
+ * @param: p_type: Particle type
+ * @param: dset_name:
  * @param: dtype_id: Data type identifier
  * @param: buf: Pointer to the allocated space for loading the dataset
  * @param: dset_info: Pointer to the argument of type eagle_dset_info

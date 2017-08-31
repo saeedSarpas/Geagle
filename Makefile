@@ -1,9 +1,9 @@
 MODULE_NAME := Geagle
 
-_CSRC := open_eagle.c \
+_CSRC := init_eagle.c \
          read_eagle_dset.c
 
-_TSRC := open_eagle_tests.c \
+_TSRC := init_eagle_tests.c \
          read_eagle_dset_tests.c
 
 _FSRC := eagle_types_f.f90 \
