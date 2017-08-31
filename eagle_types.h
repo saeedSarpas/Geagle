@@ -12,6 +12,16 @@
 #endif
 
 
+/* Particle types */
+enum _PTypes
+  {
+    gas_particles = 0,
+    DM_particles = 1,
+    star_particles = 4,
+    BH_particles = 5,
+  } PType;
+
+
 typedef struct _eagle_header_t
 {
   double BoxSize, E_z, ExpansionFactor, H_z, HubbleParam, Omega0,

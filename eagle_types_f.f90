@@ -3,6 +3,17 @@ module eagle_types
 
   implicit none
 
+  enum, bind(c)
+     enumerator :: &
+          gas_particles = 0, &
+          DM_particles = 1, &
+          star_particles = 4, &
+          BH_particles = 5
+  end enum
+
+  public gas_particles, DM_particles, star_particles, BH_particles
+
+
   type, bind(C) :: eagle_header_t
      real(c_double) :: BoxSize, E_z, ExpansionFactor, H_z, HubbleParam, &
           Omega0, OmegaBaryon, OmegaLambda, Redshift, Time, MassTable(6)
@@ -13,11 +24,13 @@ module eagle_types
      character(len=1, kind=c_char), dimension(256) :: RunLabel;
   end type eagle_header_t
 
+
   type, bind(C) :: eagle_units_t
      real(c_double) :: UnitDensity_in_cgs, UnitEnergy_in_cgs, &
           UnitLength_in_cm, UnitMass_in_g, UnitPressure_in_cgs, UnitTime_in_s, &
           UnitVelocity_in_cm_per_s
   end type eagle_units_t
+
 
   type, bind(C) :: eagle_constants_t
      real(c_double) :: AVOGADRO, BOLTZMANN, C, CM_PER_MPC, ELECTRONCHARGE, &
@@ -25,6 +38,7 @@ module eagle_types
           PLANCK, PROTONMASS, RAD_CONST, SEC_PER_MEGAYEAR, SEC_PER_YEAR, &
           SOLAR_LUM, SOLAR_MASS, STEFAN, THOMPSON, T_CMB0, Z_Solar
   end type eagle_constants_t
+
 
   type, bind(C) :: eagle_runtime_pars_t
      integer(c_int) :: AGB_EnergyTransferOn, AGB_MassTransferOn, &
@@ -102,6 +116,7 @@ module eagle_types
           stellar_feedback_mode, stellar_feedback_tvir
   end type eagle_runtime_pars_t
 
+
   type, bind(C) :: eagle_chemical_elements_t
      integer(c_int) :: BG_NELEMENTS
      real(c_double) :: CalciumOverSilicon, InitAbundance_Carbon, &
@@ -116,9 +131,11 @@ module eagle_types
      character(len=1, kind=c_char), dimension(21,9) :: ElementNames
   end type eagle_chemical_elements_t
 
+
   type, bind(C) :: eagle_parameters_t
      type(eagle_chemical_elements_t) :: chemical_elements
   end type eagle_parameters_t
+
 
   type, bind(C) :: eagle_config_t
      character(len=1, kind=c_char), dimension(256) :: Config_option_000, &
