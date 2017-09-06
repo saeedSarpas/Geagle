@@ -72,10 +72,10 @@ int read_eagle_dset(char* file_path_fmt, enum _PTypes p_type, char *dset_name,
           if(
             read_h5dattrs(
               file_id, dset_path,
-              "CGSConversionFactor", H5T_NATIVE_DOUBLE, &(dset_info->CGSConversionFactor),
-              "VarDescription", H5T_STRING, dset_info->VarDescription,
-              "aexp-scale-exponent", H5T_NATIVE_FLOAT, &(dset_info->aexp_scale_exponent),
-              "h-scale-exponent", H5T_NATIVE_FLOAT, &(dset_info->h_scale_exponent),
+              "CGSConversionFactor", H5T_NATIVE_DOUBLE, &(dset_info->CGSConversionFactor), optional_attr,
+              "VarDescription", H5T_STRING, dset_info->VarDescription, optional_attr,
+              "aexp-scale-exponent", H5T_NATIVE_FLOAT, &(dset_info->aexp_scale_exponent), optional_attr,
+              "h-scale-exponent", H5T_NATIVE_FLOAT, &(dset_info->h_scale_exponent), optional_attr,
               NULL
             ) == EXIT_FAILURE)
             {

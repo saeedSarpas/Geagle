@@ -40,7 +40,7 @@ contains
     implicit none
     character(len=*), intent(in) :: fpath
     type(eagle_t), target :: eagle_o
-    integer, intent(out), optional :: status
+    integer, intent(inout), optional :: status
 
     type(c_ptr) :: eagle_p
 
