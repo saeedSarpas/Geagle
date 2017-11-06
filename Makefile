@@ -11,6 +11,6 @@ _FSRC := eagle_types_f.f90 \
 
 _CLIBS := -lHigh5 -lhdf5
 
-_FLIBS := -I /scratch/saeed/.local/include
+_FLIBS := -I ${HOME}/.local/include
 
 include ./Makefile.paCage/Makefile
