@@ -59,7 +59,7 @@ hid_t init_eagle(char *file_path_fmt, eagle_t *eagle)
     "Flag_Metals", H5T_NATIVE_INT, &(eagle->header.Flag_Metals), optional_attr,
     "Flag_Sfr", H5T_NATIVE_INT, &(eagle->header.Flag_Sfr), optional_attr,
     "Flag_StellarAge", H5T_NATIVE_INT, &(eagle->header.Flag_StellarAge), optional_attr,
-    "NumFilesPerSnapshot", H5T_NATIVE_INT, &(eagle->header.NumFilesPerSnapshot), optional_attr,
+    "NumFilesPerSnapshot", H5T_NATIVE_INT, &(eagle->header.NumFilesPerSnapshot), required_attr,
     "NumPart_ThisFile", H5T_NATIVE_INT, eagle->header.NumPart_ThisFile, required_attr,
     "NumPart_Total", H5T_NATIVE_INT, eagle->header.NumPart_Total, required_attr,
     "NumPart_Total_HighWord", H5T_NATIVE_INT, eagle->header.NumPart_Total_HighWord, optional_attr,

@@ -202,6 +202,24 @@ typedef struct _eagle_dset_info_t
 } eagle_dset_info_t;
 
 
+typedef struct _eagle_hashtable_t
+{
+  int *FirstKeyInFile;
+  int *LastKeyInFile;
+  int *NumKeysInFile;
+  int **NumParticleInCell;
+} eagle_hashtable_t;
+
+
+typedef struct _eagle_hash_t
+{
+  int *map;
+  int map_len;
+  int bits;
+  eagle_hashtable_t table[6];
+} eagle_hash_t;
+
+
 #ifdef __cplusplus
 #define }
 #endif

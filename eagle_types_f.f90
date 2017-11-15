@@ -168,7 +168,7 @@ module eagle_types
      type(eagle_constants_t) :: constants
      type(eagle_runtime_pars_t) :: runtime_pars
      type(eagle_parameters_t) :: parameters
-     type(eagle_config_t) :: config
+     type(eagle_config_t) :: confi
   end type eagle_t
 
 
@@ -177,5 +177,19 @@ module eagle_types
      real(c_double) :: CGSConversionFactor
      character(len=1, kind=c_char), dimension(256) :: VarDescription
   end type eagle_dset_info_t
+
+
+  type, bind(C) :: eagle_hashtable_t
+     type(c_ptr) :: FirstKeyInFile, LastKeyInFile, NumKeysInFile, &
+          NumParticleInCell
+  end type eagle_hashtable_t
+
+
+  type, bind(C) :: eagle_hash_t
+     type(c_ptr) :: map
+     integer(c_int) :: map_len, bits
+     type(eagle_hashtable_t) :: table(6)
+  end type eagle_hash_t
+
 
 end module eagle_types
