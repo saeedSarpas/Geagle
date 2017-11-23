@@ -36,6 +36,7 @@ int init_hash(char *fmt_path, eagle_hash_t *hash)
 
   read_h5attr(file_id, "HashTable", "HashBits", H5T_NATIVE_INT, &(hash->bits));
   read_h5attr(file_id, "Header", "NumFilesPerSnapshot", H5T_NATIVE_INT, &nfiles);
+  read_h5attr(file_id, "Header", "BoxSize", H5T_NATIVE_DOUBLE, &(hash->box_size));
   hash->map_len = 1 << (3 * hash->bits);
   hash->map = calloc(hash->map_len, sizeof(int));
 
