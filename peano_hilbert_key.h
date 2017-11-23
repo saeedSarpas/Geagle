@@ -5,7 +5,7 @@
 typedef  long long  peanokey;
 
 
-peanokey peano_key(int, int, int, int);
+peanokey peano_hilbert_key(int, int, int, int);
 
 
 #endif /* _PEANO_HILBERT_KEY_H_ */

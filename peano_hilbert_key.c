@@ -1,6 +1,6 @@
 /*
  * peano_hilbert_key.c
- * tests_file: peano_key_tests.c
+ * tests_file: peano_hilbert_key_tests.c
  *
  * Generating Peano key based on cell numbers
  *
@@ -14,6 +14,13 @@
 
 
 #include "./peano_hilbert_key.h"
+
+
+#define fix_boundary(i, ncells)                 \
+  {                                             \
+    while(i < 0) i += ncells;                   \
+    while(i >= ncells) i -= ncells;             \
+  }                                             \
 
 
 static int quadrants[24][2][2][2] = {
@@ -69,12 +76,18 @@ static char rotymap_table[24] = {
 };
 
 
-peanokey peano_key(int i, int j, int k, int bits)
+peanokey peano_hilbert_key(int i, int j, int k, int bits)
 {
   int mask, key, rotation, sense;
   int ibit, jbit, kbit;
   int rotx, roty;
   int quad;
+
+  int ncells = 1 << bits;
+
+  fix_boundary(i, ncells);
+  fix_boundary(j, ncells);
+  fix_boundary(k, ncells);
 
   mask = 1 << (bits - 1);
   rotation = 0;

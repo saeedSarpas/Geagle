@@ -2,11 +2,14 @@ MODULE_NAME := Geagle
 
 _CSRC := init_eagle.c \
          read_eagle_dset.c \
-         init_hash.c
+         init_hash.c \
+         peano_hilbert_key.c \
+         crop_eagle.c
 
 _TSRC := init_eagle_tests.c \
          read_eagle_dset_tests.c \
-         init_hash_tests.c
+         init_hash_tests.c \
+         crop_eagle_tests.c
 
 _FSRC := eagle_types_f.f90 \
          Geagle.f90

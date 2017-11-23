@@ -216,6 +216,7 @@ typedef struct _eagle_hash_t
   int *map;
   int map_len;
   int bits;
+  double box_size;
   eagle_hashtable_t table[6];
 } eagle_hash_t;
 
