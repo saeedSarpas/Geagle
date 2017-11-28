@@ -187,7 +187,7 @@ module eagle_types
 
   type, bind(C) :: eagle_hash_t
      type(c_ptr) :: map
-     integer(c_int) :: map_len, bits
+     integer(c_int) :: map_len, bits, num_files
      real(c_double) :: box_size;
      type(eagle_hashtable_t) :: table(6)
   end type eagle_hash_t

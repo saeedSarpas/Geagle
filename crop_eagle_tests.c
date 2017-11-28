@@ -6,6 +6,7 @@
 #include <cgreen/cgreen.h>
 #include "./crop_eagle.h"
 #include "./init_hash.h"
+#include "./peano_hilbert_key.h"
 
 
 #define SNAP_PATH "./snapshot/eagle_snap.%d.hdf5"

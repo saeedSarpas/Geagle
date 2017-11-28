@@ -28,6 +28,7 @@ Ensure(init_hash, works_properly)
   init_hash(SNAP_PATH, &hash);
 
   assert_that(hash.bits, is_equal_to(6));
+  assert_that(hash.num_files, is_equal_to(16));
   assert_that_double(hash.box_size, is_equal_to_double(8.47125));
   assert_that(hash.map_len, is_equal_to((1 << (3 * 6))));
 

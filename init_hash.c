@@ -5,7 +5,6 @@
  * Loading hashtable into hash struct
  *
  * @param: file_path_fmt: Formatted file path, e.g. /path/to/snap.%d.h5
- * @param: nfiles: Number of hdf5 files per snapshot
  * @param: hash: The hash struct to be filled
  *
  * @return: Standard EXIT_SUCCESS (EXIT_FAILURE on errors)
@@ -27,15 +26,15 @@ int init_hash(char *fmt_path, eagle_hash_t *hash)
   }
 
   char path[1024], FirstKey[128], LastKey[128], NumKeys[128], NumParticles[128];
-  int ndims, nfiles;
   hsize_t dims[32];
+  int ndims;
 
 
   sprintf(path, fmt_path, 0);
   hid_t file_id = open_h5(path, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   read_h5attr(file_id, "HashTable", "HashBits", H5T_NATIVE_INT, &(hash->bits));
-  read_h5attr(file_id, "Header", "NumFilesPerSnapshot", H5T_NATIVE_INT, &nfiles);
+  read_h5attr(file_id, "Header", "NumFilesPerSnapshot", H5T_NATIVE_INT, &(hash->num_files));
   read_h5attr(file_id, "Header", "BoxSize", H5T_NATIVE_DOUBLE, &(hash->box_size));
   hash->map_len = 1 << (3 * hash->bits);
   hash->map = calloc(hash->map_len, sizeof(int));
@@ -48,21 +47,21 @@ int init_hash(char *fmt_path, eagle_hash_t *hash)
       sprintf(LastKey, "/HashTable/PartType%d/LastKeyInFile", ptype);
       sprintf(NumKeys, "/HashTable/PartType%d/NumKeysInFile", ptype);
 
-      hash->table[ptype].FirstKeyInFile = calloc(nfiles, sizeof(int));
-      hash->table[ptype].LastKeyInFile = calloc(nfiles, sizeof(int));
-      hash->table[ptype].NumKeysInFile = calloc(nfiles, sizeof(int));
+      hash->table[ptype].FirstKeyInFile = calloc(hash->num_files, sizeof(int));
+      hash->table[ptype].LastKeyInFile = calloc(hash->num_files, sizeof(int));
+      hash->table[ptype].NumKeysInFile = calloc(hash->num_files, sizeof(int));
 
       read_h5dset(file_id, FirstKey, H5T_NATIVE_INT, hash->table[ptype].FirstKeyInFile);
       read_h5dset(file_id, LastKey, H5T_NATIVE_INT, hash->table[ptype].LastKeyInFile);
       read_h5dset(file_id, NumKeys, H5T_NATIVE_INT, hash->table[ptype].NumKeysInFile);
 
-      hash->table[ptype].NumParticleInCell = malloc(nfiles * sizeof(int*));
+      hash->table[ptype].NumParticleInCell = malloc(hash->num_files * sizeof(int*));
     }
 
   close_h5(file_id);
 
 
-  for(int ifile = 0; ifile < nfiles; ifile++)
+  for(int ifile = 0; ifile < hash->num_files; ifile++)
     {
       sprintf(path, fmt_path, ifile);
       file_id = open_h5(path, H5F_ACC_RDONLY, H5P_DEFAULT);
