@@ -16,6 +16,7 @@
 
 eagle_hash_t hash;
 eagle_t snap;
+long long nparts[6] = {0, 0, 0, 0, 0, 0};
 
 
 Describe(count_particles);
@@ -36,10 +37,12 @@ Ensure(count_particles, counts_all_particles)
   for(int i = 0; i < hash.map_len; i++)
     hash.map[i] = 1;
 
-  int nstars = count_particles(SNAP_PATH, &hash, star_particles);
+  int err = count_particles(SNAP_PATH, &hash, nparts);
 
-  assert_true(nstars >= 0);
-  assert_that(nstars, is_equal_to(snap.header.NumPart_Total[star_particles]));
+  assert_that(err, is_equal_to(EXIT_SUCCESS));
+
+  for(int i = 0; i < 6; i++)
+    assert_that(nparts[i], is_equal_to(snap.header.NumPart_Total[i]));
 }
 
 
@@ -48,10 +51,11 @@ Ensure(count_particles, counts_none_of_the_particles)
   for(int i = 0; i < hash.map_len; i++)
     hash.map[i] = 0;
 
-  int ngas = count_particles(SNAP_PATH, &hash, gas_particles);
+  int err = count_particles(SNAP_PATH, &hash, nparts);
 
-  assert_true(ngas >= 0);
-  assert_that(ngas, is_equal_to(0));
+  assert_that(err, is_equal_to(EXIT_SUCCESS));
+  for(int i = 0; i < 6; i++)
+    assert_that(nparts[i], is_equal_to(0));
 }
 
 
@@ -60,16 +64,23 @@ Ensure(count_particles, always_returns_in_sensable_range)
   for(int i = 0; i < hash.map_len; i++)
     hash.map[i] = 0;
 
-  int old_nparts = 0, new_nparts;
+  int err, old_nparts[6] = {0, 0, 0, 0, 0, 0},
+    new_nparts[6] = {0, 0, 0, 0, 0, 0};
 
   for(int i = 0; i < hash.map_len; i += hash.map_len / 20)
     {
       hash.map[i] = 1;
-      new_nparts = count_particles(SNAP_PATH, &hash, DM_particles);
+      err = count_particles(SNAP_PATH, &hash, nparts);
 
-      assert_true(new_nparts > old_nparts);
-      assert_true(new_nparts < snap.header.NumPart_Total[DM_particles]);
+      assert_that(err, is_equal_to(EXIT_SUCCESS));
 
-      old_nparts = new_nparts;
+      for(int i = 0; i < 6; i++)
+        {
+          new_nparts[i] += nparts[i];
+          assert_true(new_nparts[i] <= snap.header.NumPart_Total[i]);
+          assert_true(new_nparts[i] >= old_nparts[i]);
+          old_nparts[i] = new_nparts[i];
+        }
+
     }
 }

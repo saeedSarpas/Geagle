@@ -6,9 +6,9 @@
  *
  * @param: fmt_path: Formatted file path, e.g. /path/to/snap.%d.h5
  * @param: hash: The hash struct to be filled
- * @param: ptype: Particle type
+ * @param: nparts: An array of length 6 to be filled with the number of particles
  *
- * @return: Number of particles (<0 on errors)
+ * @return: Standard EXIT_SUCCESS/EXIT_FAILURE
  */
 
 
@@ -18,7 +18,7 @@
 #include "./count_particles.h"
 
 
-int count_particles(char *fmt_path, eagle_hash_t *hash, enum _PTypes ptype)
+int count_particles(char *fmt_path, eagle_hash_t *hash, long long *nparts)
 {
   if(strstr(fmt_path, "%d") == NULL) {
     printf("[Warning] Please use a formatted file path.\n");
@@ -26,24 +26,27 @@ int count_particles(char *fmt_path, eagle_hash_t *hash, enum _PTypes ptype)
     return -1;
   }
 
-  eagle_hashtable_t table = hash->table[ptype];
-
   long long offset = 0;
-  int nparts = 0;
 
+  for(int i = 0; i < 6; i++)
+    nparts[i] = 0;
 
-  for(int i = 0; i < hash->num_files; i++)
+  for(int ptype = 0; ptype < 6; ptype++)
     {
-      if(table.NumKeysInFile[i] <= 0) continue;
+      if(ptype == 2 || ptype == 3) continue;
 
-      for(int key = table.FirstKeyInFile[i]; key <= table.LastKeyInFile[i]; key++)
+      for(int ifile = 0; ifile < hash->num_files; ifile++)
         {
-          if(!hash->map[key]) continue;
+          for(int key = hash->table[ptype].FirstKeyInFile[ifile];
+              key <= hash->table[ptype].LastKeyInFile[ifile]; key++)
+            {
+              if(!hash->map[key]) continue;
 
-          offset = key - table.FirstKeyInFile[i];
-          nparts += table.NumParticleInCell[i][offset];
+              offset = key - hash->table[ptype].FirstKeyInFile[ifile];
+              nparts[ptype] += hash->table[ptype].NumParticleInCell[ifile][offset];
+            }
         }
     }
 
-  return nparts;
+  return EXIT_SUCCESS;
 }

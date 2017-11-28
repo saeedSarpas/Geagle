@@ -5,7 +5,7 @@
 #include "./eagle_types.h"
 
 
-int count_particles(char*, eagle_hash_t*, enum _PTypes);
+int count_particles(char*, eagle_hash_t*, long long*);
 
 
 #endif /* _COUNT_PARTICLES_H_ */
