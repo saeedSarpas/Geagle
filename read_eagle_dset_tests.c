@@ -6,6 +6,9 @@
 #include <cgreen/cgreen.h>
 #include <assert.h>
 #include "./read_eagle_dset.h"
+#include "./init_hash.h"
+#include "./crop_eagle.h"
+#include "./count_particles.h"
 
 
 #define DSET_1D_NAME "ElementAbundance/Hydrogen"
@@ -13,8 +16,9 @@
 #define NUM_FILES 16
 
 
-char eagle_1st_snap_path[256] = "./snapshot/eagle_snap.0.hdf5";
-char eagle_snap_paths_fmt[256] = "./snapshot/eagle_snap.%d.hdf5";
+#define SNAP_1ST_PATH "./snapshot/eagle_snap.0.hdf5"
+#define SNAP_FMT_PATH "./snapshot/eagle_snap.%d.hdf5"
+
 int tot_num_part[6];
 
 
@@ -28,7 +32,7 @@ BeforeEach(read_eagle_dset)
 
   assert(H5open() >= 0);
 
-  file_id = H5Fopen(eagle_1st_snap_path, H5F_ACC_RDONLY, H5P_DEFAULT);
+  file_id = H5Fopen(SNAP_1ST_PATH, H5F_ACC_RDONLY, H5P_DEFAULT);
   assert(file_id >= 0);
 
   group_id = H5Gopen(file_id, "Header", H5P_DEFAULT);
@@ -46,7 +50,7 @@ BeforeEach(read_eagle_dset)
   h5err = H5Fclose(file_id);
   if (h5err < 0)
     printf("[ERROR] Unable to close EAGLE snapshot: %s",
-           eagle_1st_snap_path);
+           SNAP_1ST_PATH);
 }
 
 
@@ -64,8 +68,9 @@ Ensure(read_eagle_dset, reads_eagle_1d_dataset)
   dset_info.aexp_scale_exponent = 1.23456789;
   dset_info.h_scale_exponent = 1.23456789;
 
-  assert_that(read_eagle_dset(eagle_snap_paths_fmt, star_particles,
-                              DSET_1D_NAME, H5T_NATIVE_DOUBLE, buf, &dset_info),
+  assert_that(read_eagle_dset(SNAP_FMT_PATH, star_particles,
+                              DSET_1D_NAME, H5T_NATIVE_DOUBLE, buf,
+                              &dset_info, NULL),
               is_equal_to(EXIT_SUCCESS));
 
   herr_t h5err;
@@ -79,7 +84,7 @@ Ensure(read_eagle_dset, reads_eagle_1d_dataset)
 
   for(int ifile = 0; ifile < NUM_FILES; ifile++)
     {
-      sprintf(file_path, eagle_snap_paths_fmt, ifile);
+      sprintf(file_path, SNAP_FMT_PATH, ifile);
 
       file_id = H5Fopen(file_path, H5F_ACC_RDONLY, H5P_DEFAULT);
       assert(file_id >= 0);
@@ -142,8 +147,9 @@ Ensure(read_eagle_dset, reads_eagle_3d_dataset)
   dset_info.aexp_scale_exponent = 1.23456789;
   dset_info.h_scale_exponent = 1.23456789;
 
-  assert_that(read_eagle_dset(eagle_snap_paths_fmt, star_particles,
-                              DSET_3D_NAME, H5T_NATIVE_DOUBLE, buf, &dset_info),
+  assert_that(read_eagle_dset(SNAP_FMT_PATH, star_particles,
+                              DSET_3D_NAME, H5T_NATIVE_DOUBLE, buf,
+                              &dset_info, NULL),
               is_equal_to(EXIT_SUCCESS));
 
   herr_t h5err;
@@ -157,7 +163,7 @@ Ensure(read_eagle_dset, reads_eagle_3d_dataset)
 
   for(int ifile = 0; ifile < NUM_FILES; ifile++)
     {
-      sprintf(file_path, eagle_snap_paths_fmt, ifile);
+      sprintf(file_path, SNAP_FMT_PATH, ifile);
 
       file_id = H5Fopen(file_path, H5F_ACC_RDONLY, H5P_DEFAULT);
       assert(file_id >= 0);
@@ -213,4 +219,50 @@ Ensure(read_eagle_dset, reads_eagle_3d_dataset)
 
   assert_that_double(dset_info.aexp_scale_exponent, is_equal_to_double(1.0));
   assert_that_double(dset_info.h_scale_exponent, is_equal_to_double(-1.0));
+}
+
+
+Ensure(read_eagle_dset, should_be_able_to_work_with_cropped_box)
+{
+  eagle_hash_t hash;
+  init_hash(SNAP_FMT_PATH, &hash);
+  crop_eagle(&hash, .0, .0, .0, hash.box_size, hash.box_size, hash.box_size / 2);
+
+  long long nparts[6];
+  count_particles(SNAP_FMT_PATH, &hash, nparts);
+
+  double *buf = malloc(nparts[star_particles] * 3 * sizeof(double));
+
+  char dset_path[1024];
+  sprintf(dset_path, "PartType%d/%s", star_particles, DSET_3D_NAME);
+
+  assert_that(read_eagle_dset(SNAP_FMT_PATH, star_particles,
+                              DSET_3D_NAME, H5T_NATIVE_DOUBLE, buf,
+                              NULL, &hash),
+              is_equal_to(EXIT_SUCCESS));
+ /* TODO: Added new tests for checking the correctness of the retrieved data */
+
+  for(int i = 0; i < hash.map_len; i++)
+    hash.map[i] = 0;
+
+  double half_box = hash.box_size / 2.0;
+  crop_eagle(&hash, half_box, half_box, half_box, half_box, half_box, half_box);
+
+  count_particles(SNAP_FMT_PATH, &hash, nparts);
+
+  free(buf);
+
+  buf = malloc(nparts[star_particles] * 3 * sizeof(double));
+
+  assert_that(read_eagle_dset(SNAP_FMT_PATH, star_particles,
+                              DSET_3D_NAME, H5T_NATIVE_DOUBLE, buf,
+                              NULL, &hash),
+              is_equal_to(EXIT_SUCCESS));
+  /* TODO: Added new tests for checking the correctness of the retrieved data */
+
+  int last = (nparts[star_particles] - 1) * 3;
+
+  assert_that_double(buf[last], is_equal_to_double(0.88297446));
+  assert_that_double(buf[last + 1], is_equal_to_double(0.293605091));
+  assert_that_double(buf[last + 2], is_equal_to_double(8.122547));
 }

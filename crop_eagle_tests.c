@@ -38,9 +38,11 @@ Ensure(crop_eagle, selects_all_regions)
 
 Ensure(crop_eagle, selects_none)
 {
-  crop_eagle(&hash, .0, .0, .0, .0, .0, .0);
+  crop_eagle(&hash, .0, .0, .0, .01, .01, .01);
 
-  for(int i = 0; i < hash.map_len; i += hash.map_len / 17)
+  assert_that(hash.map[0], is_equal_to(1));
+
+  for(int i = 1; i < hash.map_len; i += hash.map_len / 17)
     assert_that(hash.map[i], is_equal_to(0));
 }
 
