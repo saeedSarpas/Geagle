@@ -226,43 +226,27 @@ Ensure(read_eagle_dset, should_be_able_to_work_with_cropped_box)
 {
   eagle_hash_t hash;
   init_hash(SNAP_FMT_PATH, &hash);
-  crop_eagle(&hash, .0, .0, .0, hash.box_size, hash.box_size, hash.box_size / 2);
 
   long long nparts[6];
-  count_particles(SNAP_FMT_PATH, &hash, nparts);
-
-  double *buf = malloc(nparts[star_particles] * 3 * sizeof(double));
 
   char dset_path[1024];
   sprintf(dset_path, "PartType%d/%s", star_particles, DSET_3D_NAME);
 
-  assert_that(read_eagle_dset(SNAP_FMT_PATH, star_particles,
-                              DSET_3D_NAME, H5T_NATIVE_DOUBLE, buf,
-                              NULL, &hash),
-              is_equal_to(EXIT_SUCCESS));
- /* TODO: Added new tests for checking the correctness of the retrieved data */
-
-  for(int i = 0; i < hash.map_len; i++)
-    hash.map[i] = 0;
-
-  double half_box = hash.box_size / 2.0;
-  crop_eagle(&hash, half_box, half_box, half_box, half_box, half_box, half_box);
+  double half_box = hash.box_size/2.0;
+  crop_eagle(&hash, half_box, half_box, half_box, half_box/2.0, half_box/2.0, half_box/2.0);
 
   count_particles(SNAP_FMT_PATH, &hash, nparts);
 
-  free(buf);
-
-  buf = malloc(nparts[star_particles] * 3 * sizeof(double));
+  double *buf = malloc(nparts[star_particles] * 3 * sizeof(double));
 
   assert_that(read_eagle_dset(SNAP_FMT_PATH, star_particles,
                               DSET_3D_NAME, H5T_NATIVE_DOUBLE, buf,
                               NULL, &hash),
               is_equal_to(EXIT_SUCCESS));
-  /* TODO: Added new tests for checking the correctness of the retrieved data */
 
-  int last = (nparts[star_particles] - 1) * 3;
-
-  assert_that_double(buf[last], is_equal_to_double(0.88297446));
-  assert_that_double(buf[last + 1], is_equal_to_double(0.293605091));
-  assert_that_double(buf[last + 2], is_equal_to_double(8.122547));
+  for(int i = 0; i < 3 * nparts[star_particles]; i += nparts[star_particles] / 20)
+    {
+      assert_true(buf[i] >= half_box);
+      assert_true(buf[i] <= half_box + half_box / 2);
+    }
 }

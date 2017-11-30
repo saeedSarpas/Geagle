@@ -33,15 +33,15 @@ int crop_eagle(eagle_hash_t *hash, double x, double y, double z,
   int box[6] = {0, 0, 0, 0, 0, 0};
 
   box[IMIN] = (int)floor(x / hash->box_size * ncells);
-  box[IMAX] = (int)ceil((x + dx) / hash->box_size * ncells);
+  box[IMAX] = (int)floor((x + dx) / hash->box_size * ncells);
   box[JMIN] = (int)floor(y / hash->box_size * ncells);
-  box[JMAX] = (int)ceil((y + dy) / hash->box_size * ncells);
+  box[JMAX] = (int)floor((y + dy) / hash->box_size * ncells);
   box[KMIN] = (int)floor(z / hash->box_size * ncells);
-  box[KMAX] = (int)ceil((z + dz) / hash->box_size * ncells);
+  box[KMAX] = (int)floor((z + dz) / hash->box_size * ncells);
 
-  for(int i = box[IMIN]; i < box[IMAX]; i++)
-    for(int j = box[JMIN]; j < box[JMAX]; j++)
-      for(int k = box[KMIN]; k < box[KMAX]; k++)
+  for(int i = box[IMIN]; i <= box[IMAX]; i++)
+    for(int j = box[JMIN]; j <= box[JMAX]; j++)
+      for(int k = box[KMIN]; k <= box[KMAX]; k++)
         hash->map[peano_hilbert_key(i, j, k, hash->bits)] = 1;
 
   return EXIT_SUCCESS;

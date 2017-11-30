@@ -16,13 +16,6 @@
 #include "./peano_hilbert_key.h"
 
 
-#define fix_boundary(i, ncells)                 \
-  {                                             \
-    while(i < 0) i += ncells;                   \
-    while(i >= ncells) i -= ncells;             \
-  }                                             \
-
-
 static int quadrants[24][2][2][2] = {
   /* rotx=0, roty=0-3 */
   {{{0, 7}, {1, 6}}, {{3, 4}, {2, 5}}},
@@ -85,9 +78,14 @@ peanokey peano_hilbert_key(int i, int j, int k, int bits)
 
   int ncells = 1 << bits;
 
-  fix_boundary(i, ncells);
-  fix_boundary(j, ncells);
-  fix_boundary(k, ncells);
+  while(i < 0) i += ncells;
+  while(i >= ncells) i -= ncells;
+
+  while(j < 0) j += ncells;
+  while(j >= ncells) j -= ncells;
+
+  while(k < 0) k += ncells;
+  while(k >= ncells) k -= ncells;
 
   mask = 1 << (bits - 1);
   rotation = 0;

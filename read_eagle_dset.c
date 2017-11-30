@@ -61,21 +61,21 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
       sprintf(path, fmt_path, ifile);
       file_id = open_h5(path, H5F_ACC_RDONLY, H5P_DEFAULT);
 
-      buf = (char*)buf + H5Tget_size(dtype_id) * buf_offset;
+      get_h5dset_dims(file_id, dset_path, &ndims, dims);
 
       if(hash == NULL)
         {
-          get_h5dset_dims(file_id, dset_path, &ndims, dims);
+          buf = (char*)buf + H5Tget_size(dtype_id) * buf_offset;
+
+          read_h5dset(file_id, dset_path, dtype_id, buf);
 
           buf_offset = 1;
           for(int j = 0; j < ndims; j++)
             buf_offset *= (int)dims[j];
-
-          read_h5dset(file_id, dset_path, dtype_id, buf);
         }
       else
         {
-          get_h5dset_dims(file_id, dset_path, &ndims, dims);
+          buf = (char*)buf + H5Tget_size(dtype_id) * buf_offset;
 
           count[0] = 0;
           start[0] = 0;
@@ -83,32 +83,35 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
           for(int key = hash->table[ptype].FirstKeyInFile[ifile];
               key <= hash->table[ptype].LastKeyInFile[ifile]; key++)
             {
-              if(!hash->map[key])
+              while(key <= hash->table[ptype].LastKeyInFile[ifile] && !hash->map[key])
                 {
                   start[0] += hash->table[ptype].NumParticleInCell[ifile][
                     key - hash->table[ptype].FirstKeyInFile[ifile]
                   ];
-                  continue;
+                  key++;
                 }
 
-              while(key <= hash->table[ptype].LastKeyInFile[ifile] && hash->map[key] == 1)
+              while(key <= hash->table[ptype].LastKeyInFile[ifile] && hash->map[key])
                 {
                   count[0] += hash->table[ptype].NumParticleInCell[ifile][
                     key - hash->table[ptype].FirstKeyInFile[ifile]
                   ];
                   key++;
                 }
-            }
 
-          buf_offset = count[0];
-          for(int j = 1; j < ndims; j++)
-            {
-              buf_offset *= dims[j];
-              start[j] = 0;
-              count[j] = dims[j];
-            }
+              buf_offset = count[0];
+              for(int j = 1; j < ndims; j++)
+                {
+                  buf_offset *= dims[j];
+                  start[j] = 0;
+                  count[j] = (count[0] == 0) ? 0 : dims[j];
+                }
 
-          read_h5dset_part(file_id, dset_path, start, count, dtype_id, buf);
+              read_h5dset_part(file_id, dset_path, start, count, dtype_id, buf);
+
+              start[0] += count[0];
+              count[0] = 0;
+            }
         }
 
       if(ifile == (num_files - 1) && dset_info != NULL)

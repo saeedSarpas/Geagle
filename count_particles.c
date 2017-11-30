@@ -26,8 +26,6 @@ int count_particles(char *fmt_path, eagle_hash_t *hash, long long *nparts)
     return -1;
   }
 
-  long long offset = 0;
-
   for(int i = 0; i < 6; i++)
     nparts[i] = 0;
 
@@ -42,8 +40,9 @@ int count_particles(char *fmt_path, eagle_hash_t *hash, long long *nparts)
             {
               if(!hash->map[key]) continue;
 
-              offset = key - hash->table[ptype].FirstKeyInFile[ifile];
-              nparts[ptype] += hash->table[ptype].NumParticleInCell[ifile][offset];
+              nparts[ptype] += hash->table[ptype].NumParticleInCell[ifile][
+                key - hash->table[ptype].FirstKeyInFile[ifile]
+              ];
             }
         }
     }
