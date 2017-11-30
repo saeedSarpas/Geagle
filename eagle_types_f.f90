@@ -168,7 +168,7 @@ module eagle_types
      type(eagle_constants_t) :: constants
      type(eagle_runtime_pars_t) :: runtime_pars
      type(eagle_parameters_t) :: parameters
-     type(eagle_config_t) :: confi
+     type(eagle_config_t) :: config
   end type eagle_t
 
 
@@ -189,8 +189,7 @@ module eagle_types
      type(c_ptr) :: map
      integer(c_int) :: map_len, bits, num_files
      real(c_double) :: box_size;
-     type(eagle_hashtable_t) :: table(6)
+     type(eagle_hashtable_t), dimension(6) :: table
   end type eagle_hash_t
-
 
 end module eagle_types
