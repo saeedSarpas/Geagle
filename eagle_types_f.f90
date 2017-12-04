@@ -181,7 +181,7 @@ module eagle_types
 
   type, bind(C) :: eagle_hashtable_t
      type(c_ptr) :: FirstKeyInFile, LastKeyInFile, NumKeysInFile, &
-          NumParticleInCell
+          NumParticleInCell, FirstParticleInCell
   end type eagle_hashtable_t
 
 

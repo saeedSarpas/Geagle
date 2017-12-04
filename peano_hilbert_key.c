@@ -76,17 +76,6 @@ peanokey peano_hilbert_key(int i, int j, int k, int bits)
   int rotx, roty;
   int quad;
 
-  int ncells = 1 << bits;
-
-  while(i < 0) i += ncells;
-  while(i >= ncells) i -= ncells;
-
-  while(j < 0) j += ncells;
-  while(j >= ncells) j -= ncells;
-
-  while(k < 0) k += ncells;
-  while(k >= ncells) k -= ncells;
-
   mask = 1 << (bits - 1);
   rotation = 0;
   sense = 1;

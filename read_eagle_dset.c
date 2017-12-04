@@ -47,9 +47,9 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
   sprintf(dset_path, "PartType%d/%s", ptype, dset_name);
 
   int num_files;
-  hid_t file_id = open_h5(path, H5F_ACC_RDONLY, H5P_DEFAULT);
-  read_h5attr(file_id, "Header", "NumFilesPerSnapshot", H5T_NATIVE_INT, &num_files);
-  close_h5(file_id);
+  hid_t fid = open_h5(path, H5F_ACC_RDONLY, H5P_DEFAULT);
+  read_h5attr(fid, "Header", "NumFilesPerSnapshot", H5T_NATIVE_INT, &num_files);
+  close_h5(fid);
 
   hsize_t dims[MAXDIM];
   int ndims, buf_offset = 0;
@@ -59,15 +59,21 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
   for(int ifile = 0; ifile < num_files; ifile++)
     {
       sprintf(path, fmt_path, ifile);
-      file_id = open_h5(path, H5F_ACC_RDONLY, H5P_DEFAULT);
+      fid = open_h5(path, H5F_ACC_RDONLY, H5P_DEFAULT);
 
-      get_h5dset_dims(file_id, dset_path, &ndims, dims);
+      get_h5dset_dims(fid, dset_path, &ndims, dims);
+
+      for(int i = 1; i < ndims; i++)
+        {
+          count[i] = dims[i];
+          start[i] = 0;
+        }
 
       if(hash == NULL)
         {
           buf = (char*)buf + H5Tget_size(dtype_id) * buf_offset;
 
-          read_h5dset(file_id, dset_path, dtype_id, buf);
+          read_h5dset(fid, dset_path, dtype_id, buf);
 
           buf_offset = 1;
           for(int j = 0; j < ndims; j++)
@@ -75,21 +81,20 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
         }
       else
         {
-          buf = (char*)buf + H5Tget_size(dtype_id) * buf_offset;
-
           count[0] = 0;
           start[0] = 0;
 
-          for(int key = hash->table[ptype].FirstKeyInFile[ifile];
+          for(long long key = hash->table[ptype].FirstKeyInFile[ifile];
               key <= hash->table[ptype].LastKeyInFile[ifile]; key++)
             {
+              buf = (char*)buf + H5Tget_size(dtype_id) * buf_offset;
+
               while(key <= hash->table[ptype].LastKeyInFile[ifile] && !hash->map[key])
-                {
-                  start[0] += hash->table[ptype].NumParticleInCell[ifile][
-                    key - hash->table[ptype].FirstKeyInFile[ifile]
-                  ];
                   key++;
-                }
+
+              start[0] = hash->table[ptype].FirstParticleInCell[ifile][
+                key - hash->table[ptype].FirstKeyInFile[ifile]
+              ];
 
               while(key <= hash->table[ptype].LastKeyInFile[ifile] && hash->map[key])
                 {
@@ -98,16 +103,14 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
                   ];
                   key++;
                 }
+              key--; /* for loop will increment key */
 
               buf_offset = count[0];
-              for(int j = 1; j < ndims; j++)
-                {
-                  buf_offset *= dims[j];
-                  start[j] = 0;
-                  count[j] = (count[0] == 0) ? 0 : dims[j];
-                }
+              for(int i = 1; i < ndims; i++)
+                buf_offset *= (int)dims[i];
 
-              read_h5dset_part(file_id, dset_path, start, count, dtype_id, buf);
+              if(count[0] > 0)
+                read_h5dset_part(fid, dset_path, dtype_id, start, count, buf);
 
               start[0] += count[0];
               count[0] = 0;
@@ -116,7 +119,7 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
 
       if(ifile == (num_files - 1) && dset_info != NULL)
         read_h5dattrs(
-          file_id, dset_path,
+          fid, dset_path,
           "CGSConversionFactor", H5T_NATIVE_DOUBLE, &(dset_info->CGSConversionFactor), optional_attr,
           "VarDescription", H5T_STRING, dset_info->VarDescription, optional_attr,
           "aexp-scale-exponent", H5T_NATIVE_FLOAT, &(dset_info->aexp_scale_exponent), optional_attr,
@@ -124,7 +127,7 @@ int read_eagle_dset(char* fmt_path, enum _PTypes ptype, char *dset_name,
           NULL
         );
 
-      close_h5(file_id);
+      close_h5(fid);
     }
 
   return EXIT_SUCCESS;

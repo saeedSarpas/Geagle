@@ -244,7 +244,7 @@ Ensure(read_eagle_dset, should_be_able_to_work_with_cropped_box)
                               NULL, &hash),
               is_equal_to(EXIT_SUCCESS));
 
-  for(int i = 0; i < 3 * nparts[star_particles]; i += nparts[star_particles] / 20)
+  for(int i = 0; i < 3 * nparts[star_particles]; i++)
     {
       assert_true(buf[i] >= half_box);
       assert_true(buf[i] <= half_box + half_box / 2);

@@ -208,6 +208,7 @@ typedef struct _eagle_hashtable_t
   int *LastKeyInFile;
   int *NumKeysInFile;
   int **NumParticleInCell;
+  int **FirstParticleInCell;
 } eagle_hashtable_t;
 
 

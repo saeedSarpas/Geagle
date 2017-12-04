@@ -56,6 +56,7 @@ int init_hash(char *fmt_path, eagle_hash_t *hash)
       read_h5dset(file_id, NumKeys, H5T_NATIVE_INT, hash->table[ptype].NumKeysInFile);
 
       hash->table[ptype].NumParticleInCell = malloc(hash->num_files * sizeof(int*));
+      hash->table[ptype].FirstParticleInCell = malloc(hash->num_files * sizeof(int*));
     }
 
   close_h5(file_id);
@@ -74,9 +75,16 @@ int init_hash(char *fmt_path, eagle_hash_t *hash)
 
           get_h5dset_dims(file_id, NumParticles, &ndims, dims);
           hash->table[ptype].NumParticleInCell[ifile] = calloc(dims[0], sizeof(int));
+          hash->table[ptype].FirstParticleInCell[ifile] = calloc(dims[0], sizeof(int));
 
           read_h5dset(file_id, NumParticles, H5T_NATIVE_INT,
                       hash->table[ptype].NumParticleInCell[ifile]);
+
+          hash->table[ptype].FirstParticleInCell[ifile][0] = 0;
+          for(int i = 0; i < (int)dims[0]; i++)
+            hash->table[ptype].FirstParticleInCell[ifile][i] =
+              hash->table[ptype].FirstParticleInCell[ifile][i-1] +
+              hash->table[ptype].NumParticleInCell[ifile][i-1];
         }
 
       close_h5(file_id);

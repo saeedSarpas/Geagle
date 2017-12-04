@@ -5,8 +5,6 @@ module Geagle
 
   interface
      function init_eagle_i(fpath, eagle) bind(C, name="init_eagle")
-       use hdf5
-       use eagle_types
        use iso_c_binding
        implicit none
        character(len=1, kind=c_char), dimension(*), intent(in) :: fpath
@@ -16,8 +14,6 @@ module Geagle
 
      function read_eagle_dset_i(file_path, ptype, dset_name, dtype_id, buf, &
           dest_info, hash) bind(C, name="read_eagle_dset")
-       use hdf5
-       use eagle_types
        use iso_c_binding
        implicit none
        character(len=1, kind=c_char), dimension(*), intent(in) :: file_path
@@ -29,8 +25,6 @@ module Geagle
      end function read_eagle_dset_i
 
      function count_particles_i(file_path, hash, nparts) bind(C, name="count_particles")
-       use hdf5
-       use eagle_types
        use iso_c_binding
        implicit none
        character(len=1, kind=c_char), dimension(*), intent(in) :: file_path
@@ -39,8 +33,6 @@ module Geagle
      end function count_particles_i
 
      function crop_eagle_i(hash, x, y, z, dx, dy, dz) bind(C, name="crop_eagle")
-       use hdf5
-       use eagle_types
        use iso_c_binding
        implicit none
        type(c_ptr), value, intent(in) :: hash
@@ -49,8 +41,6 @@ module Geagle
      end function crop_eagle_i
 
      function init_hash_i(file_path, hash) bind(C, name="init_hash")
-       use hdf5
-       use eagle_types
        use iso_c_binding
        implicit none
        character(len=1, kind=c_char), dimension(*), intent(in) :: file_path
@@ -59,8 +49,6 @@ module Geagle
      end function init_hash_i
 
      function peano_hilbert_key_i(i, j, k, bits) bind(C, name="peano_hilbert_key")
-       use hdf5
-       use eagle_types
        use iso_c_binding
        implicit none
        integer(kind=c_int), value :: i, j, k, bits
@@ -99,30 +87,21 @@ contains
 
 
   subroutine read_eagle_dset_1d_f(file_path, ptype, dset_name, dtype_id, buf, &
-       err, dset_info, hash)
+       dset_info, hash, err)
     implicit none
     character(len=*), intent(in) :: file_path
     integer :: ptype
     character(len=*), intent(in) :: dset_name
     integer(hid_t), value, intent(in) :: dtype_id
     class(*), dimension(:), target :: buf
-    integer, optional :: err
-    type(eagle_dset_info_t), target, optional :: dset_info
-    type(eagle_hash_t), target, optional :: hash
+    type(eagle_dset_info_t), target :: dset_info
+    type(eagle_hash_t), target :: hash
+    integer :: err
 
     type(c_ptr) :: buf_p, dset_info_p, hash_p
 
-    if (present(dset_info)) then
-       dset_info_p = c_loc(dset_info)
-    else
-       dset_info_p = c_null_ptr
-    end if
-
-    if(present(hash)) then
-       hash_p = c_loc(hash)
-    else
-       hash_p = c_null_ptr
-    end if
+    dset_info_p = c_loc(dset_info)
+    hash_p = c_loc(hash)
 
     ! c_loc doesn't accept a polymorphic variable. Following is an attempt to
     ! overcome this problem
@@ -143,30 +122,21 @@ contains
 
 
   subroutine read_eagle_dset_2d_f(file_path, ptype, dset_name, dtype_id, buf, &
-       err, dset_info, hash)
+       dset_info, hash, err)
     implicit none
     character(len=*), intent(in) :: file_path
     integer :: ptype
     character(len=*), intent(in) :: dset_name
     integer(hid_t), value, intent(in) :: dtype_id
     class(*), dimension(:,:), target :: buf
-    integer, optional :: err
-    type(eagle_dset_info_t), target, optional :: dset_info
-    type(eagle_hash_t), target, optional :: hash
+    type(eagle_dset_info_t), target :: dset_info
+    type(eagle_hash_t), target :: hash
+    integer :: err
 
     type(c_ptr) :: buf_p, dset_info_p, hash_p
 
-    if (present(dset_info)) then
-       dset_info_p = c_loc(dset_info)
-    else
-       dset_info_p = c_null_ptr
-    end if
-
-    if(present(hash)) then
-       hash_p = c_loc(hash)
-    else
-       hash_p = c_null_ptr
-    end if
+    dset_info_p = c_loc(dset_info)
+    hash_p = c_loc(hash)
 
     ! c_loc doesn't accept a polymorphic variable. Following is an attempt to
     ! overcome this problem

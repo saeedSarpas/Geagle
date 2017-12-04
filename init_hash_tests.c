@@ -70,6 +70,15 @@ Ensure(init_hash, works_properly)
               assert_that(hash.table[ptype].NumParticleInCell[ifile][i],
                           is_equal_to(get(file_id, NumParticles, i)));
             }
+
+          for(int i = 1; i < num_keys/500; i++)
+            {
+              assert_true(
+                hash.table[ptype].FirstParticleInCell[ifile][i] ==
+                hash.table[ptype].FirstParticleInCell[ifile][i-1] +
+                get(file_id, NumParticles, i-1)
+              );
+            }
         }
 
       H5Fclose(file_id);
