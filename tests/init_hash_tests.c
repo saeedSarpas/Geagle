@@ -5,7 +5,7 @@
 
 #include <cgreen/cgreen.h>
 #include <assert.h>
-#include "./init_hash.h"
+#include "./../src/init_hash.h"
 
 
 #define SNAP_PATH "./snapshot/eagle_snap.%d.hdf5"

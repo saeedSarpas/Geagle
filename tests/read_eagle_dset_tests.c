@@ -5,10 +5,10 @@
 
 #include <cgreen/cgreen.h>
 #include <assert.h>
-#include "./read_eagle_dset.h"
-#include "./init_hash.h"
-#include "./crop_eagle.h"
-#include "./count_particles.h"
+#include "./../src/read_eagle_dset.h"
+#include "./../src/init_hash.h"
+#include "./../src/crop_eagle.h"
+#include "./../src/count_particles.h"
 
 
 #define DSET_1D_NAME "ElementAbundance/Hydrogen"

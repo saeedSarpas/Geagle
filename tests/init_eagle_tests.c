@@ -5,7 +5,7 @@
 
 #include <cgreen/cgreen.h>
 #include <math.h>
-#include "./init_eagle.h"
+#include "./../src/init_eagle.h"
 
 
 #define EAGLE_PATH "./snapshot/eagle_snap.%d.hdf5"

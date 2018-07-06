@@ -5,10 +5,10 @@
 
 #include <stdlib.h>
 #include <cgreen/cgreen.h>
-#include "./count_particles.h"
-#include "./init_hash.h"
-#include "./init_eagle.h"
-#include "./eagle_types.h"
+#include "./../src/count_particles.h"
+#include "./../src/init_hash.h"
+#include "./../src/init_eagle.h"
+#include "./../src/eagle_types.h"
 
 
 #define SNAP_PATH "./snapshot/eagle_snap.%d.hdf5"
